@@ -1,0 +1,6 @@
+# Ignore large checkpoints and related artifacts
+*.pth
+*.pt
+
+# Ignore any git metadata inside the cloned DINO repo
+/dino/.git
