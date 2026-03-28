@@ -33,10 +33,64 @@ from torchvision import models as torchvision_models
 import utils
 import vision_transformer as vits
 from vision_transformer import DINOHead
+from ucr_dino_dataset import MultiUCRDinoDataset
 
 torchvision_archs = sorted(name for name in torchvision_models.__dict__
     if name.islower() and not name.startswith("__")
     and callable(torchvision_models.__dict__[name]))
+
+
+class BalancedDistributedSampler(torch.utils.data.Sampler):
+    """Distributed sampler that balances across underlying UCR datasets.
+
+    Sampling probability for each (sample, channel) shard is set inversely
+    proportional to the number of shards in its dataset, so that each
+    dataset contributes roughly equally in expectation.
+    """
+
+    def __init__(self, dataset, num_replicas=None, rank=None, seed=0):
+        if num_replicas is None:
+            if not dist.is_available():
+                raise RuntimeError("Requires distributed package to be available")
+            num_replicas = dist.get_world_size()
+        if rank is None:
+            if not dist.is_available():
+                raise RuntimeError("Requires distributed package to be available")
+            rank = dist.get_rank()
+        self.dataset = dataset
+        self.num_replicas = num_replicas
+        self.rank = rank
+        self.seed = seed
+
+        self.num_samples = int(math.ceil(len(self.dataset) * 1.0 / self.num_replicas))
+        self.total_size = self.num_samples * self.num_replicas
+
+        # Precompute per-sample weights based on dataset index.
+        from collections import Counter
+
+        dataset_indices = [triplet[0] for triplet in self.dataset._index_map]
+        counts = Counter(dataset_indices)
+        self.weights = torch.tensor([1.0 / counts[d] for d in dataset_indices], dtype=torch.double)
+
+        self.epoch = 0
+
+    def __iter__(self):
+        # Sample indices with replacement according to weights, in a way
+        # that is deterministic per epoch and shared across processes.
+        g = torch.Generator()
+        g.manual_seed(self.seed + self.epoch)
+
+        indices = torch.multinomial(self.weights, self.total_size, replacement=True, generator=g).tolist()
+
+        # Subsample for this rank.
+        indices_rank = indices[self.rank:self.total_size:self.num_replicas]
+        return iter(indices_rank)
+
+    def __len__(self):
+        return self.num_samples
+
+    def set_epoch(self, epoch):
+        self.epoch = epoch
 
 def get_args_parser():
     parser = argparse.ArgumentParser('DINO', add_help=False)
@@ -125,6 +179,10 @@ def get_args_parser():
     parser.add_argument('--num_workers', default=10, type=int, help='Number of data loading workers per GPU.')
     parser.add_argument("--dist_url", default="env://", type=str, help="""url used to set up
         distributed training; see https://pytorch.org/docs/stable/distributed.html""")
+    # torch.distributed.launch passes --local-rank; we accept it here for
+    # compatibility, but the actual GPU selection is done from the
+    # LOCAL_RANK environment variable in utils.init_distributed_mode.
+    parser.add_argument('--local-rank', default=0, type=int, help='Dummy argument for torch.distributed.launch.')
     parser.add_argument("--local_rank", default=0, type=int, help="Please ignore and do not set this argument.")
     return parser
 
@@ -142,8 +200,19 @@ def train_dino(args):
         args.local_crops_scale,
         args.local_crops_number,
     )
-    dataset = datasets.ImageFolder(args.data_path, transform=transform)
-    sampler = torch.utils.data.DistributedSampler(dataset, shuffle=True)
+
+    # Use all available multivariate UCR datasets under args.data_path
+    # (e.g. ./data/multivariate) for DINO pretraining.
+    dataset = MultiUCRDinoDataset(root_path=args.data_path, transform=transform, split="train")
+
+    # Sampler: balanced across UCR datasets for both single- and multi-GPU
+    # runs. Each dataset contributes roughly equally in expectation.
+    sampler = BalancedDistributedSampler(
+        dataset,
+        num_replicas=args.world_size,
+        rank=args.rank,
+        seed=args.seed,
+    )
     data_loader = torch.utils.data.DataLoader(
         dataset,
         sampler=sampler,
