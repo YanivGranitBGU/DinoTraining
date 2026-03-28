@@ -179,10 +179,6 @@ def get_args_parser():
     parser.add_argument('--num_workers', default=10, type=int, help='Number of data loading workers per GPU.')
     parser.add_argument("--dist_url", default="env://", type=str, help="""url used to set up
         distributed training; see https://pytorch.org/docs/stable/distributed.html""")
-    # torch.distributed.launch passes --local-rank; we accept it here for
-    # compatibility, but the actual GPU selection is done from the
-    # LOCAL_RANK environment variable in utils.init_distributed_mode.
-    parser.add_argument('--local-rank', default=0, type=int, help='Dummy argument for torch.distributed.launch.')
     parser.add_argument("--local_rank", default=0, type=int, help="Please ignore and do not set this argument.")
     return parser
 
@@ -200,7 +196,6 @@ def train_dino(args):
         args.local_crops_scale,
         args.local_crops_number,
     )
-
     # Use all available multivariate UCR datasets under args.data_path
     # (e.g. ./data/multivariate) for DINO pretraining.
     dataset = MultiUCRDinoDataset(root_path=args.data_path, transform=transform, split="train")
