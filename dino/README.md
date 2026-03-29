@@ -165,6 +165,31 @@ Run DINO with ViT-small network on a single node with 8 GPUs for 100 epochs with
 python -m torch.distributed.launch --nproc_per_node=8 main_dino.py --arch vit_small --data_path /path/to/imagenet/train --output_dir /path/to/saving_dir
 ```
 
+### Using LoRA adapters (this repo extension)
+
+This fork adds optional LoRA adapters on top of the ViT attention projections, controlled by a flag.
+
+- Enable LoRA during DINO pretraining by passing:
+  - `--use_lora true` to turn on LoRA in the student ViT backbone.
+  - `--lora_rank` (e.g. `4`, `8`, `16`) to control the low-rank dimension.
+  - `--lora_alpha` to scale the LoRA update (effective scaling is `alpha / rank`).
+- When LoRA is enabled:
+  - The *student* ViT uses LoRA-wrapped attention `qkv` / projection layers.
+  - The base ViT weights are frozen; only LoRA parameters (and the DINO head) are trainable.
+  - The *teacher* ViT remains a standard DINO model without LoRA.
+
+Example (single-node, 1 GPU, tiny model, multivariate UCR data in this repo):
+```bash
+python main_dino.py \
+  --arch vit_tiny \
+  --patch_size 8 \
+  --data_path /path/to/multivariate_data \
+  --output_dir /path/to/saving_dir \
+  --use_lora true \
+  --lora_rank 8 \
+  --lora_alpha 16.0
+```
+
 ### Multi-node training
 We use Slurm and [submitit](https://github.com/facebookincubator/submitit) (`pip install submitit`). To train on 2 nodes with 8 GPUs each (total 16 GPUs):
 ```

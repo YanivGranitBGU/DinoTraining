@@ -158,6 +158,15 @@ def get_args_parser():
         choices=['adamw', 'sgd', 'lars'], help="""Type of optimizer. We recommend using adamw with ViTs.""")
     parser.add_argument('--drop_path_rate', type=float, default=0.1, help="stochastic depth rate")
 
+    # LoRA adapters (optional)
+    parser.add_argument('--use_lora', type=utils.bool_flag, default=False, help="""Whether to enable
+        LoRA adapters in the ViT attention projections. When enabled, only LoRA parameters in the
+        backbone (plus the DINO head) are trainable; the base ViT weights remain frozen.""")
+    parser.add_argument('--lora_rank', type=int, default=8, help="""LoRA rank (r). Set to a small
+        value like 4, 8, or 16. When --use_lora=false this is ignored.""")
+    parser.add_argument('--lora_alpha', type=float, default=16.0, help="""LoRA scaling factor. Effective
+        update is scaled by alpha / r. When --use_lora=false this is ignored.""")
+
     # Multi-crop parameters
     parser.add_argument('--global_crops_scale', type=float, nargs='+', default=(0.4, 1.),
         help="""Scale range of the cropped image before resizing, relatively to the origin image.
@@ -223,10 +232,14 @@ def train_dino(args):
     args.arch = args.arch.replace("deit", "vit")
     # if the network is a Vision Transformer (i.e. vit_tiny, vit_small, vit_base)
     if args.arch in vits.__dict__.keys():
+        lora_rank = args.lora_rank if args.use_lora else 0
         student = vits.__dict__[args.arch](
             patch_size=args.patch_size,
             drop_path_rate=args.drop_path_rate,  # stochastic depth
+            lora_rank=lora_rank,
+            lora_alpha=args.lora_alpha,
         )
+        # Teacher stays a standard ViT (no LoRA adapters)
         teacher = vits.__dict__[args.arch](patch_size=args.patch_size)
         embed_dim = student.embed_dim
     # if the network is a XCiT
@@ -254,6 +267,38 @@ def train_dino(args):
         teacher,
         DINOHead(embed_dim, args.out_dim, args.use_bn_in_head),
     )
+
+    # When using LoRA, freeze all backbone parameters except LoRA adapters.
+    if args.use_lora and args.arch in vits.__dict__.keys():
+        for name, param in student.backbone.named_parameters():
+            # LoRA parameters are named lora_A / lora_B inside LoRALinear
+            if "lora_A" in name or "lora_B" in name:
+                param.requires_grad = True
+            else:
+                param.requires_grad = False
+
+    # ============ report parameter counts (student side) ============
+    if utils.is_main_process():
+        total_params = sum(p.numel() for p in student.parameters())
+        trainable_params = sum(p.numel() for p in student.parameters() if p.requires_grad)
+        lora_params = sum(
+            p.numel()
+            for n, p in student.named_parameters()
+            if "lora_A" in n or "lora_B" in n
+        )
+        head_params = sum(
+            p.numel()
+            for n, p in student.named_parameters()
+            if n.startswith("head.")
+        )
+        print("\n==== DINO student parameter counts ====")
+        print(f"Total params (student + head): {total_params}")
+        print(f"Trainable params:              {trainable_params}")
+        print(f"Trainable ratio:               {trainable_params/total_params:.4f}")
+        print(f"DINO head params only:         {head_params}")
+        if args.use_lora and args.arch in vits.__dict__.keys():
+            print(f"LoRA params only:              {lora_params}")
+        print("======================================\n")
     # move networks to gpu
     student, teacher = student.cuda(), teacher.cuda()
     # synchronize batch norms (if any)
@@ -268,8 +313,10 @@ def train_dino(args):
         # teacher_without_ddp and teacher are the same thing
         teacher_without_ddp = teacher
     student = nn.parallel.DistributedDataParallel(student, device_ids=[args.gpu])
-    # teacher and student start with the same weights
-    teacher_without_ddp.load_state_dict(student.module.state_dict())
+    # teacher and student start with the same base weights.
+    # When LoRA is enabled, the student has additional lora_* parameters
+    # that do not exist in the teacher; we ignore those extra keys.
+    teacher_without_ddp.load_state_dict(student.module.state_dict(), strict=False)
     # there is no backpropagation through the teacher, so no need for gradients
     for p in teacher.parameters():
         p.requires_grad = False
@@ -410,8 +457,29 @@ def train_one_epoch(student, teacher, teacher_without_ddp, dino_loss, data_loade
         # EMA update for the teacher
         with torch.no_grad():
             m = momentum_schedule[it]  # momentum parameter
-            for param_q, param_k in zip(student.module.parameters(), teacher_without_ddp.parameters()):
-                param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
+            if args.use_lora and args.arch in vits.__dict__.keys():
+                # When using LoRA, the student backbone has extra lora_* parameters
+                # that are not present in the teacher. We therefore perform EMA
+                # only over the non-LoRA backbone weights and the DINO head.
+                student_backbone = student.module.backbone
+                teacher_backbone = teacher_without_ddp.backbone
+
+                student_backbone_params = [
+                    p for n, p in student_backbone.named_parameters()
+                    if "lora_A" not in n and "lora_B" not in n
+                ]
+                teacher_backbone_params = list(teacher_backbone.parameters())
+                for param_q, param_k in zip(student_backbone_params, teacher_backbone_params):
+                    param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
+
+                # Also update the projection head parameters.
+                student_head_params = list(student.module.head.parameters())
+                teacher_head_params = list(teacher_without_ddp.head.parameters())
+                for param_q, param_k in zip(student_head_params, teacher_head_params):
+                    param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
+            else:
+                for param_q, param_k in zip(student.module.parameters(), teacher_without_ddp.parameters()):
+                    param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
 
         # logging
         torch.cuda.synchronize()
