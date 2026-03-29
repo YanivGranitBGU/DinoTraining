@@ -109,6 +109,82 @@ def load_pretrained_weights(model, pretrained_weights, checkpoint_key, model_nam
             print("There is no reference weights available for this model => We use random weights.")
 
 
+def load_pretrained_weights_for_lora(model, pretrained_weights, checkpoint_key, model_name, patch_size):
+    """Load non-LoRA DINO weights into a LoRA-enabled ViT.
+
+    This helper adapts the state_dict so that keys like
+    "blocks.0.attn.qkv.weight" from a standard ViT checkpoint are mapped to
+    the inner linear weights of LoRA-wrapped layers,
+    e.g. "blocks.0.attn.qkv.linear.weight".
+
+    It is intended for the case where you build a LoRA model
+    (lora_rank > 0) and want to initialize its base weights from an
+    existing non-LoRA DINO checkpoint before fine-tuning.
+    """
+
+    def _adapt_for_lora(state_dict):
+        adapted = {}
+        for k, v in state_dict.items():
+            new_k = k
+            # Map attention projections to the inner linear of LoRALinear.
+            if ".attn.qkv." in k:
+                new_k = k.replace(".attn.qkv.", ".attn.qkv.linear.")
+            elif ".attn.proj." in k:
+                new_k = k.replace(".attn.proj.", ".attn.proj.linear.")
+            adapted[new_k] = v
+        return adapted
+
+    if os.path.isfile(pretrained_weights):
+        state_dict = torch.load(pretrained_weights, map_location="cpu")
+        if checkpoint_key is not None and checkpoint_key in state_dict:
+            print(f"Take key {checkpoint_key} in provided checkpoint dict")
+            state_dict = state_dict[checkpoint_key]
+        # remove `module.` prefix
+        state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+        # remove `backbone.` prefix induced by multicrop wrapper
+        state_dict = {k.replace("backbone.", ""): v for k, v in state_dict.items()}
+        state_dict = _adapt_for_lora(state_dict)
+        msg = model.load_state_dict(state_dict, strict=False)
+        print(
+            "Pretrained (non-LoRA) weights found at {} and loaded into LoRA model with msg: {}".format(
+                pretrained_weights, msg
+            )
+        )
+    else:
+        print("Please use the `--pretrained_weights` argument to indicate the path of the checkpoint to evaluate.")
+        url = None
+        if model_name == "vit_small" and patch_size == 16:
+            url = "dino_deitsmall16_pretrain/dino_deitsmall16_pretrain.pth"
+        elif model_name == "vit_small" and patch_size == 8:
+            url = "dino_deitsmall8_pretrain/dino_deitsmall8_pretrain.pth"
+        elif model_name == "vit_base" and patch_size == 16:
+            url = "dino_vitbase16_pretrain/dino_vitbase16_pretrain.pth"
+        elif model_name == "vit_base" and patch_size == 8:
+            url = "dino_vitbase8_pretrain/dino_vitbase8_pretrain.pth"
+        # for non-ViT architectures (xcit, resnet), fall back to the
+        # standard loader without LoRA-specific remapping.
+        elif model_name == "xcit_small_12_p16":
+            url = "dino_xcit_small_12_p16_pretrain/dino_xcit_small_12_p16_pretrain.pth"
+        elif model_name == "xcit_small_12_p8":
+            url = "dino_xcit_small_12_p8_pretrain/dino_xcit_small_12_p8_pretrain.pth"
+        elif model_name == "xcit_medium_24_p16":
+            url = "dino_xcit_medium_24_p16_pretrain/dino_xcit_medium_24_p16_pretrain.pth"
+        elif model_name == "xcit_medium_24_p8":
+            url = "dino_xcit_medium_24_p8_pretrain/dino_xcit_medium_24_p8_pretrain.pth"
+        elif model_name == "resnet50":
+            url = "dino_resnet50_pretrain/dino_resnet50_pretrain.pth"
+        if url is not None:
+            print("Since no pretrained weights have been provided, we load the reference pretrained DINO weights.")
+            state_dict = torch.hub.load_state_dict_from_url(url="https://dl.fbaipublicfiles.com/dino/" + url)
+            # When using ViT + LoRA, adapt the keys for attention layers so
+            # they map into the inner linear weights of LoRALinear.
+            if "vit" in model_name:
+                state_dict = _adapt_for_lora(state_dict)
+            model.load_state_dict(state_dict, strict=True)
+        else:
+            print("There is no reference weights available for this model => We use random weights.")
+
+
 def load_pretrained_linear_weights(linear_classifier, model_name, patch_size):
     url = None
     if model_name == "vit_small" and patch_size == 16:

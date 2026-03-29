@@ -58,13 +58,14 @@ class LoRALinear(nn.Module):
             self.lora_B = nn.Parameter(torch.zeros(out_features, self.r))
             nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
             nn.init.zeros_(self.lora_B)
+
+            # Freeze base linear weights; only LoRA params remain trainable.
+            for p in self.linear.parameters():
+                p.requires_grad = False
         else:
+            # No LoRA: behave exactly like a plain nn.Linear.
             self.lora_A = None
             self.lora_B = None
-
-        # Freeze base linear weights; only LoRA params remain trainable.
-        for p in self.linear.parameters():
-            p.requires_grad = False
 
     def forward(self, x):
         result = self.linear(x)
@@ -136,10 +137,16 @@ class Attention(nn.Module):
 
         base_qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
         base_proj = nn.Linear(dim, dim)
-        # Wrap attention projections with LoRA; when lora_rank == 0 this is a no-op
-        self.qkv = LoRALinear(base_qkv, r=lora_rank, lora_alpha=lora_alpha, lora_dropout=0.0)
+        # Only wrap with LoRA when lora_rank > 0; otherwise keep the
+        # original nn.Linear modules so the architecture and state_dict
+        # stay identical to standard DINO ViT.
+        if lora_rank and lora_rank > 0:
+            self.qkv = LoRALinear(base_qkv, r=lora_rank, lora_alpha=lora_alpha, lora_dropout=0.0)
+            self.proj = LoRALinear(base_proj, r=lora_rank, lora_alpha=lora_alpha, lora_dropout=0.0)
+        else:
+            self.qkv = base_qkv
+            self.proj = base_proj
         self.attn_drop = nn.Dropout(attn_drop)
-        self.proj = LoRALinear(base_proj, r=lora_rank, lora_alpha=lora_alpha, lora_dropout=0.0)
         self.proj_drop = nn.Dropout(proj_drop)
 
     def forward(self, x):

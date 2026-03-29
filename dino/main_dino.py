@@ -30,6 +30,12 @@ import torch.nn.functional as F
 from torchvision import datasets, transforms
 from torchvision import models as torchvision_models
 
+# Make sure local modules (like utils.py) can be imported when this
+# script is run directly or via a shell wrapper.
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
 import utils
 import vision_transformer as vits
 from vision_transformer import DINOHead
@@ -167,6 +173,13 @@ def get_args_parser():
     parser.add_argument('--lora_alpha', type=float, default=16.0, help="""LoRA scaling factor. Effective
         update is scaled by alpha / r. When --use_lora=false this is ignored.""")
 
+    # Optional pretrained weights (for fine-tuning or LoRA)
+    parser.add_argument('--pretrained_weights', default='', type=str,
+        help="""Path to pretrained DINO weights to initialize the backbone.
+        If empty, training starts from random init (as in original DINO).""")
+    parser.add_argument('--checkpoint_key', default='teacher', type=str,
+        help='Key to use inside the checkpoint dict (e.g. "teacher" or "student").')
+
     # Multi-crop parameters
     parser.add_argument('--global_crops_scale', type=float, nargs='+', default=(0.4, 1.),
         help="""Scale range of the cropped image before resizing, relatively to the origin image.
@@ -239,8 +252,14 @@ def train_dino(args):
             lora_rank=lora_rank,
             lora_alpha=args.lora_alpha,
         )
-        # Teacher stays a standard ViT (no LoRA adapters)
-        teacher = vits.__dict__[args.arch](patch_size=args.patch_size)
+        # Teacher uses the same ViT architecture (including LoRA adapters).
+        # All of its parameters are frozen w.r.t. gradients and are updated
+        # only via EMA from the student.
+        teacher = vits.__dict__[args.arch](
+            patch_size=args.patch_size,
+            lora_rank=lora_rank,
+            lora_alpha=args.lora_alpha,
+        )
         embed_dim = student.embed_dim
     # if the network is a XCiT
     elif args.arch in torch.hub.list("facebookresearch/xcit:main"):
@@ -267,6 +286,38 @@ def train_dino(args):
         teacher,
         DINOHead(embed_dim, args.out_dim, args.use_bn_in_head),
     )
+
+    # Optionally initialize the ViT backbone from pretrained DINO weights.
+    if args.pretrained_weights:
+        if args.arch in vits.__dict__.keys():
+            if args.use_lora:
+                # LoRA-enabled ViT: map standard DINO weights into
+                # the inner linear layers of LoRALinear.
+                utils.load_pretrained_weights_for_lora(
+                    student.backbone,
+                    args.pretrained_weights,
+                    args.checkpoint_key,
+                    args.arch,
+                    args.patch_size,
+                )
+            else:
+                # Standard ViT without LoRA.
+                utils.load_pretrained_weights(
+                    student.backbone,
+                    args.pretrained_weights,
+                    args.checkpoint_key,
+                    args.arch,
+                    args.patch_size,
+                )
+        else:
+            # For non-ViT architectures, fall back to the generic loader.
+            utils.load_pretrained_weights(
+                student.backbone if hasattr(student, 'backbone') else student,
+                args.pretrained_weights,
+                args.checkpoint_key,
+                args.arch,
+                args.patch_size,
+            )
 
     # When using LoRA, freeze all backbone parameters except LoRA adapters.
     if args.use_lora and args.arch in vits.__dict__.keys():
@@ -457,29 +508,9 @@ def train_one_epoch(student, teacher, teacher_without_ddp, dino_loss, data_loade
         # EMA update for the teacher
         with torch.no_grad():
             m = momentum_schedule[it]  # momentum parameter
-            if args.use_lora and args.arch in vits.__dict__.keys():
-                # When using LoRA, the student backbone has extra lora_* parameters
-                # that are not present in the teacher. We therefore perform EMA
-                # only over the non-LoRA backbone weights and the DINO head.
-                student_backbone = student.module.backbone
-                teacher_backbone = teacher_without_ddp.backbone
-
-                student_backbone_params = [
-                    p for n, p in student_backbone.named_parameters()
-                    if "lora_A" not in n and "lora_B" not in n
-                ]
-                teacher_backbone_params = list(teacher_backbone.parameters())
-                for param_q, param_k in zip(student_backbone_params, teacher_backbone_params):
-                    param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
-
-                # Also update the projection head parameters.
-                student_head_params = list(student.module.head.parameters())
-                teacher_head_params = list(teacher_without_ddp.head.parameters())
-                for param_q, param_k in zip(student_head_params, teacher_head_params):
-                    param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
-            else:
-                for param_q, param_k in zip(student.module.parameters(), teacher_without_ddp.parameters()):
-                    param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
+            # EMA over all teacher parameters (backbone, LoRA, and DINO head).
+            for param_q, param_k in zip(student.module.parameters(), teacher_without_ddp.parameters()):
+                param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
 
         # logging
         torch.cuda.synchronize()
