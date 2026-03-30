@@ -32,10 +32,6 @@ from torchvision import models as torchvision_models
 
 # Make sure local modules (like utils.py) can be imported when this
 # script is run directly or via a shell wrapper.
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.insert(0, current_dir)
-
 import utils
 import vision_transformer as vits
 from vision_transformer import DINOHead
