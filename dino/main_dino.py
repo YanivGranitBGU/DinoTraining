@@ -48,9 +48,11 @@ class BalancedDistributedSampler(torch.utils.data.Sampler):
     Sampling probability for each (sample, channel) shard is set inversely
     proportional to the number of shards in its dataset, so that each
     dataset contributes roughly equally in expectation.
+    Optionally, a fixed global number of samples per epoch can be used
+    instead of iterating over the entire dataset size.
     """
 
-    def __init__(self, dataset, num_replicas=None, rank=None, seed=0):
+    def __init__(self, dataset, num_replicas=None, rank=None, seed=0, samples_per_epoch=None):
         if num_replicas is None:
             if not dist.is_available():
                 raise RuntimeError("Requires distributed package to be available")
@@ -64,8 +66,15 @@ class BalancedDistributedSampler(torch.utils.data.Sampler):
         self.rank = rank
         self.seed = seed
 
-        self.num_samples = int(math.ceil(len(self.dataset) * 1.0 / self.num_replicas))
-        self.total_size = self.num_samples * self.num_replicas
+        # Determine how many samples to draw per epoch globally. If
+        # samples_per_epoch is provided, we use that as the target total
+        # number of (sample, channel) shards drawn across all GPUs.
+        if samples_per_epoch is not None:
+            self.num_samples = int(math.ceil(samples_per_epoch * 1.0 / self.num_replicas))
+            self.total_size = self.num_samples * self.num_replicas
+        else:
+            self.num_samples = int(math.ceil(len(self.dataset) * 1.0 / self.num_replicas))
+            self.total_size = self.num_samples * self.num_replicas
 
         # Precompute per-sample weights based on dataset index.
         from collections import Counter
@@ -160,6 +169,10 @@ def get_args_parser():
         choices=['adamw', 'sgd', 'lars'], help="""Type of optimizer. We recommend using adamw with ViTs.""")
     parser.add_argument('--drop_path_rate', type=float, default=0.1, help="stochastic depth rate")
 
+    parser.add_argument('--global_samples_per_epoch', type=int, default=0,
+        help='If >0, total number of (sample, channel) shards drawn per epoch across all GPUs. '
+             '0 means use the full dataset-derived epoch size.')
+
     # LoRA adapters (optional)
     parser.add_argument('--use_lora', type=utils.bool_flag, default=False, help="""Whether to enable
         LoRA adapters in the ViT attention projections. When enabled, only LoRA parameters in the
@@ -220,11 +233,15 @@ def train_dino(args):
 
     # Sampler: balanced across UCR datasets for both single- and multi-GPU
     # runs. Each dataset contributes roughly equally in expectation.
+    samples_per_epoch = None
+    if hasattr(args, "global_samples_per_epoch") and args.global_samples_per_epoch > 0:
+        samples_per_epoch = args.global_samples_per_epoch
     sampler = BalancedDistributedSampler(
         dataset,
         num_replicas=args.world_size,
         rank=args.rank,
         seed=args.seed,
+        samples_per_epoch=samples_per_epoch,
     )
     data_loader = torch.utils.data.DataLoader(
         dataset,
