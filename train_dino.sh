@@ -4,12 +4,13 @@
 cd /home/yanivgra/DinoTraining/dino
 
 # Default: tiny 1-GPU smoke test on multivariate UCR data
+# Use this to quickly verify that training runs and the loss decreases.
 python main_dino.py \
     --arch vit_tiny \
     --patch_size 8 \
     --data_path /home/yanivgra/DinoTraining/data/multivariate \
     --output_dir /home/yanivgra/DinoTraining/output_smoke_1gpu \
-    --epochs 2 \
+    --epochs 10 \
     --warmup_epochs 0 \
     --batch_size_per_gpu 16 \
     --saveckp_freq 0 \
