@@ -1,0 +1,4043 @@
+{
+  "config": {
+    "checkpoint_path": "/home/yanivgra/DinoTraining/output_lora_8gpu/checkpoint0007.pth",
+    "checkpoint_key": "teacher",
+    "checkpoint_tag": "lora_0007",
+    "use_lora": true,
+    "linear_finetune": false,
+    "search_label_permutations": true,
+    "print_logs": true,
+    "compute_tsne": false,
+    "data_root": "/home/yanivgra/Frequency-masked-Embedding-Inference/datasets_clsa/UCR_CLSA",
+    "dataset": "all",
+    "output_dir": "/home/yanivgra/DinoTraining/output_lora_8gpu/eval_ucr_clsa_zeroshot_bestperm/lora_0007",
+    "result_filename": "",
+    "include_excluded_datasets": false,
+    "skip_nan_inf_datasets": true,
+    "min_train_samples_for_eval": 30,
+    "min_test_samples_for_eval": 30,
+    "min_sequence_length_for_eval": 30,
+    "arch": "vit_base",
+    "patch_size": 8,
+    "n_last_blocks": 1,
+    "avgpool_patchtokens": true,
+    "lora_rank": 8,
+    "lora_alpha": 16.0,
+    "batch_size": 64,
+    "num_workers": 4,
+    "linear_batch_size": 256,
+    "linear_epochs": 100,
+    "lr": 0.001,
+    "weight_decay": 0.0,
+    "seed": 0,
+    "device": "cuda:0"
+  },
+  "summary": {
+    "num_datasets": 94,
+    "num_skipped": 34,
+    "num_success": 94,
+    "mean_acc1": 65.47569248904573
+  },
+  "skipped_datasets": [
+    {
+      "dataset": "AllGestureWiimoteX",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "AllGestureWiimoteY",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "AllGestureWiimoteZ",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "BeetleFly",
+      "reason": "too_small(train=20, test=20, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "BirdChicken",
+      "reason": "too_small(train=20, test=20, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "Chinatown",
+      "reason": "too_small(train=20, test=343, thresholds=train>=30, test>=30) | too_short(train_L=24, test_L=24, threshold=L>=30)"
+    },
+    {
+      "dataset": "Coffee",
+      "reason": "too_small(train=28, test=28, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "DiatomSizeReduction",
+      "reason": "too_small(train=16, test=306, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "DodgerLoopDay",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "DodgerLoopGame",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False) | too_small(train=20, test=138, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "DodgerLoopWeekend",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False) | too_small(train=20, test=138, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "ECGFiveDays",
+      "reason": "too_small(train=23, test=861, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "FaceFour",
+      "reason": "too_small(train=24, test=88, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "FreezerSmallTrain",
+      "reason": "too_small(train=28, test=2850, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "Fungi",
+      "reason": "too_small(train=18, test=186, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "GestureMidAirD1",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "GestureMidAirD2",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "GestureMidAirD3",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "GesturePebbleZ1",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "GesturePebbleZ2",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "InsectEPGSmallTrain",
+      "reason": "too_small(train=17, test=249, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "ItalyPowerDemand",
+      "reason": "too_short(train_L=24, test_L=24, threshold=L>=30)"
+    },
+    {
+      "dataset": "MelbournePedestrian",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False) | too_short(train_L=24, test_L=24, threshold=L>=30)"
+    },
+    {
+      "dataset": "MoteStrain",
+      "reason": "too_small(train=20, test=1252, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "PLAID",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "PickupGestureWiimoteZ",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "Rock",
+      "reason": "too_small(train=20, test=50, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "ShakeGestureWiimoteZ",
+      "reason": "nan_or_inf(train_nan=True, train_inf=False, test_nan=True, test_inf=False)"
+    },
+    {
+      "dataset": "ShapeletSim",
+      "reason": "too_small(train=20, test=180, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "SmoothSubspace",
+      "reason": "too_short(train_L=15, test_L=15, threshold=L>=30)"
+    },
+    {
+      "dataset": "SonyAIBORobotSurface1",
+      "reason": "too_small(train=20, test=601, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "SonyAIBORobotSurface2",
+      "reason": "too_small(train=27, test=953, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "Symbols",
+      "reason": "too_small(train=25, test=995, thresholds=train>=30, test>=30)"
+    },
+    {
+      "dataset": "TwoLeadECG",
+      "reason": "too_small(train=23, test=1139, thresholds=train>=30, test>=30)"
+    }
+  ],
+  "results": {
+    "ACSF1": {
+      "acc1": 50.0,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 10,
+      "train_size": 100,
+      "test_size": 100
+    },
+    "Adiac": {
+      "acc1": 59.590792655944824,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 21,
+        "22": 22,
+        "23": 23,
+        "24": 24,
+        "25": 25,
+        "26": 26,
+        "27": 27,
+        "28": 28,
+        "29": 29,
+        "30": 30,
+        "31": 31,
+        "32": 32,
+        "33": 33,
+        "34": 34,
+        "35": 35,
+        "36": 36
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 37,
+      "train_size": 390,
+      "test_size": 391
+    },
+    "ArrowHead": {
+      "acc1": 56.57142996788025,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 36,
+      "test_size": 175
+    },
+    "BME": {
+      "acc1": 48.66666793823242,
+      "label_mapping": {
+        "0": 2,
+        "1": 1,
+        "2": 0
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 30,
+      "test_size": 150
+    },
+    "Beef": {
+      "acc1": 53.33333611488342,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 3,
+        "3": 2,
+        "4": 4
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 5,
+      "train_size": 30,
+      "test_size": 30
+    },
+    "CBF": {
+      "acc1": 77.66666412353516,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 30,
+      "test_size": 900
+    },
+    "Car": {
+      "acc1": 68.33333373069763,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 4,
+      "train_size": 60,
+      "test_size": 60
+    },
+    "ChlorineConcentration": {
+      "acc1": 40.59895873069763,
+      "label_mapping": {
+        "0": 0,
+        "1": 2,
+        "2": 1
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 467,
+      "test_size": 3840
+    },
+    "CinCECGTorso": {
+      "acc1": 55.14492988586426,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 4,
+      "train_size": 40,
+      "test_size": 1380
+    },
+    "Computers": {
+      "acc1": 67.59999990463257,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 250,
+      "test_size": 250
+    },
+    "CricketX": {
+      "acc1": 60.51282286643982,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 12,
+      "train_size": 390,
+      "test_size": 390
+    },
+    "CricketY": {
+      "acc1": 58.20512771606445,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 12,
+      "train_size": 390,
+      "test_size": 390
+    },
+    "CricketZ": {
+      "acc1": 59.48718190193176,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 12,
+      "train_size": 390,
+      "test_size": 390
+    },
+    "Crop": {
+      "acc1": 49.13095235824585,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 21,
+        "22": 22,
+        "23": 23
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 24,
+      "train_size": 7200,
+      "test_size": 16800
+    },
+    "DistalPhalanxOutlineAgeGroup": {
+      "acc1": 71.22302055358887,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 400,
+      "test_size": 139
+    },
+    "DistalPhalanxOutlineCorrect": {
+      "acc1": 57.24637508392334,
+      "label_mapping": {
+        "0": 1,
+        "1": 0
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 600,
+      "test_size": 276
+    },
+    "DistalPhalanxTW": {
+      "acc1": 65.46762585639954,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 6,
+      "train_size": 400,
+      "test_size": 139
+    },
+    "ECG200": {
+      "acc1": 75.0,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 100,
+      "test_size": 100
+    },
+    "ECG5000": {
+      "acc1": 78.82221937179565,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 5,
+      "train_size": 500,
+      "test_size": 4500
+    },
+    "EOGHorizontalSignal": {
+      "acc1": 54.1436493396759,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 12,
+      "train_size": 362,
+      "test_size": 362
+    },
+    "EOGVerticalSignal": {
+      "acc1": 50.0,
+      "label_mapping": {
+        "0": 0,
+        "1": 7,
+        "2": 3,
+        "3": 2,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 1,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 12,
+      "train_size": 362,
+      "test_size": 362
+    },
+    "Earthquakes": {
+      "acc1": 53.23740839958191,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 322,
+      "test_size": 139
+    },
+    "ElectricDevices": {
+      "acc1": 54.50654625892639,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 6,
+        "3": 5,
+        "4": 4,
+        "5": 3,
+        "6": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 7,
+      "train_size": 8926,
+      "test_size": 7711
+    },
+    "EthanolLevel": {
+      "acc1": 33.399999141693115,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 4,
+      "train_size": 504,
+      "test_size": 500
+    },
+    "FaceAll": {
+      "acc1": 66.03550314903259,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 14,
+      "train_size": 560,
+      "test_size": 1690
+    },
+    "FacesUCR": {
+      "acc1": 60.04878282546997,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 14,
+      "train_size": 200,
+      "test_size": 2050
+    },
+    "FiftyWords": {
+      "acc1": 51.64835453033447,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 30,
+        "22": 22,
+        "23": 23,
+        "24": 24,
+        "25": 25,
+        "26": 26,
+        "27": 27,
+        "28": 28,
+        "29": 21,
+        "30": 29,
+        "31": 31,
+        "32": 32,
+        "33": 33,
+        "34": 34,
+        "35": 35,
+        "36": 36,
+        "37": 37,
+        "38": 38,
+        "39": 39,
+        "40": 40,
+        "41": 41,
+        "42": 42,
+        "43": 43,
+        "44": 44,
+        "45": 45,
+        "46": 46,
+        "47": 47,
+        "48": 48,
+        "49": 49
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 50,
+      "train_size": 450,
+      "test_size": 455
+    },
+    "Fish": {
+      "acc1": 70.85714340209961,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 7,
+      "train_size": 175,
+      "test_size": 175
+    },
+    "FordA": {
+      "acc1": 74.69696998596191,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 3601,
+      "test_size": 1320
+    },
+    "FordB": {
+      "acc1": 61.358022689819336,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 3636,
+      "test_size": 810
+    },
+    "FreezerRegularTrain": {
+      "acc1": 79.22806739807129,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 150,
+      "test_size": 2850
+    },
+    "GunPoint": {
+      "acc1": 98.66666793823242,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 50,
+      "test_size": 150
+    },
+    "GunPointAgeSpan": {
+      "acc1": 93.03797483444214,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 135,
+      "test_size": 316
+    },
+    "GunPointMaleVersusFemale": {
+      "acc1": 75.0,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 135,
+      "test_size": 316
+    },
+    "GunPointOldVersusYoung": {
+      "acc1": 100.0,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 136,
+      "test_size": 315
+    },
+    "Ham": {
+      "acc1": 65.71428775787354,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 109,
+      "test_size": 105
+    },
+    "HandOutlines": {
+      "acc1": 71.89189195632935,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 1000,
+      "test_size": 370
+    },
+    "Haptics": {
+      "acc1": 34.41558480262756,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 5,
+      "train_size": 155,
+      "test_size": 308
+    },
+    "Herring": {
+      "acc1": 51.5625,
+      "label_mapping": {
+        "0": 1,
+        "1": 0
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 64,
+      "test_size": 64
+    },
+    "HouseTwenty": {
+      "acc1": 90.75630307197571,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 40,
+      "test_size": 119
+    },
+    "InlineSkate": {
+      "acc1": 25.272727012634277,
+      "label_mapping": {
+        "0": 1,
+        "1": 0,
+        "2": 2,
+        "3": 4,
+        "4": 3,
+        "5": 5,
+        "6": 6
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 7,
+      "train_size": 100,
+      "test_size": 550
+    },
+    "InsectEPGRegularTrain": {
+      "acc1": 100.0,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 62,
+      "test_size": 249
+    },
+    "InsectWingbeatSound": {
+      "acc1": 42.77777671813965,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 11,
+      "train_size": 220,
+      "test_size": 1980
+    },
+    "LargeKitchenAppliances": {
+      "acc1": 77.60000228881836,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 375,
+      "test_size": 375
+    },
+    "Lightning2": {
+      "acc1": 73.77049326896667,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 60,
+      "test_size": 61
+    },
+    "Lightning7": {
+      "acc1": 65.75342416763306,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 7,
+      "train_size": 70,
+      "test_size": 73
+    },
+    "Mallat": {
+      "acc1": 88.44349384307861,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 8,
+      "train_size": 55,
+      "test_size": 2345
+    },
+    "Meat": {
+      "acc1": 85.00000238418579,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 60,
+      "test_size": 60
+    },
+    "MedicalImages": {
+      "acc1": 43.94736886024475,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 10,
+      "train_size": 381,
+      "test_size": 760
+    },
+    "MiddlePhalanxOutlineAgeGroup": {
+      "acc1": 55.194807052612305,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 400,
+      "test_size": 154
+    },
+    "MiddlePhalanxOutlineCorrect": {
+      "acc1": 57.388317584991455,
+      "label_mapping": {
+        "0": 1,
+        "1": 0
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 600,
+      "test_size": 291
+    },
+    "MiddlePhalanxTW": {
+      "acc1": 53.24675440788269,
+      "label_mapping": {
+        "0": 0,
+        "1": 3,
+        "2": 1,
+        "3": 2,
+        "4": 4,
+        "5": 5
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 6,
+      "train_size": 399,
+      "test_size": 154
+    },
+    "MixedShapesRegularTrain": {
+      "acc1": 88.86597752571106,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 5,
+      "train_size": 500,
+      "test_size": 2425
+    },
+    "MixedShapesSmallTrain": {
+      "acc1": 87.34020590782166,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 5,
+      "train_size": 100,
+      "test_size": 2425
+    },
+    "NonInvasiveFetalECGThorax1": {
+      "acc1": 61.37404441833496,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 29,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 2,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 21,
+        "22": 22,
+        "23": 23,
+        "24": 24,
+        "25": 25,
+        "26": 26,
+        "27": 27,
+        "28": 28,
+        "29": 16,
+        "30": 30,
+        "31": 31,
+        "32": 32,
+        "33": 33,
+        "34": 34,
+        "35": 35,
+        "36": 36,
+        "37": 37,
+        "38": 38,
+        "39": 39,
+        "40": 40,
+        "41": 41
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 42,
+      "train_size": 1800,
+      "test_size": 1965
+    },
+    "NonInvasiveFetalECGThorax2": {
+      "acc1": 71.14503979682922,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 21,
+        "22": 22,
+        "23": 23,
+        "24": 24,
+        "25": 25,
+        "26": 26,
+        "27": 27,
+        "28": 28,
+        "29": 29,
+        "30": 30,
+        "31": 31,
+        "32": 32,
+        "33": 33,
+        "34": 34,
+        "35": 35,
+        "36": 36,
+        "37": 37,
+        "38": 38,
+        "39": 39,
+        "40": 40,
+        "41": 41
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 42,
+      "train_size": 1800,
+      "test_size": 1965
+    },
+    "OSULeaf": {
+      "acc1": 90.08264541625977,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 6,
+      "train_size": 200,
+      "test_size": 242
+    },
+    "OliveOil": {
+      "acc1": 66.66666865348816,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 4,
+      "train_size": 30,
+      "test_size": 30
+    },
+    "PhalangesOutlinesCorrect": {
+      "acc1": 50.58274865150452,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 1800,
+      "test_size": 858
+    },
+    "Phoneme": {
+      "acc1": 19.778481125831604,
+      "label_mapping": {
+        "0": 3,
+        "1": 0,
+        "2": 2,
+        "3": 12,
+        "4": 4,
+        "5": 11,
+        "6": 6,
+        "7": 25,
+        "8": 8,
+        "9": 18,
+        "10": 10,
+        "11": 17,
+        "12": 26,
+        "13": 31,
+        "14": 22,
+        "15": 15,
+        "16": 36,
+        "17": 16,
+        "18": 9,
+        "19": 19,
+        "20": 20,
+        "21": 21,
+        "22": 23,
+        "23": 24,
+        "24": 1,
+        "25": 5,
+        "26": 14,
+        "27": 27,
+        "28": 28,
+        "29": 7,
+        "30": 30,
+        "31": 13,
+        "32": 32,
+        "33": 33,
+        "34": 34,
+        "35": 35,
+        "36": 29,
+        "37": 37,
+        "38": 38
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 39,
+      "train_size": 214,
+      "test_size": 1896
+    },
+    "PigAirwayPressure": {
+      "acc1": 42.78846085071564,
+      "label_mapping": {
+        "0": 15,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 36,
+        "8": 8,
+        "9": 7,
+        "10": 10,
+        "11": 12,
+        "12": 22,
+        "13": 11,
+        "14": 26,
+        "15": 9,
+        "16": 16,
+        "17": 17,
+        "18": 0,
+        "19": 18,
+        "20": 19,
+        "21": 21,
+        "22": 14,
+        "23": 23,
+        "24": 30,
+        "25": 25,
+        "26": 34,
+        "27": 27,
+        "28": 28,
+        "29": 29,
+        "30": 20,
+        "31": 31,
+        "32": 32,
+        "33": 33,
+        "34": 24,
+        "35": 35,
+        "36": 46,
+        "37": 37,
+        "38": 50,
+        "39": 39,
+        "40": 40,
+        "41": 41,
+        "42": 38,
+        "43": 13,
+        "44": 44,
+        "45": 45,
+        "46": 43,
+        "47": 47,
+        "48": 48,
+        "49": 49,
+        "50": 42,
+        "51": 51
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 52,
+      "train_size": 104,
+      "test_size": 208
+    },
+    "PigArtPressure": {
+      "acc1": 87.0192289352417,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 12,
+        "12": 11,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 21,
+        "22": 22,
+        "23": 23,
+        "24": 24,
+        "25": 25,
+        "26": 26,
+        "27": 27,
+        "28": 28,
+        "29": 29,
+        "30": 30,
+        "31": 31,
+        "32": 32,
+        "33": 33,
+        "34": 34,
+        "35": 35,
+        "36": 36,
+        "37": 37,
+        "38": 38,
+        "39": 39,
+        "40": 40,
+        "41": 41,
+        "42": 42,
+        "43": 43,
+        "44": 44,
+        "45": 45,
+        "46": 46,
+        "47": 47,
+        "48": 48,
+        "49": 49,
+        "50": 50,
+        "51": 51
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 52,
+      "train_size": 104,
+      "test_size": 208
+    },
+    "PigCVP": {
+      "acc1": 52.88461446762085,
+      "label_mapping": {
+        "0": 16,
+        "1": 21,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 34,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 0,
+        "22": 22,
+        "23": 1,
+        "24": 24,
+        "25": 25,
+        "26": 26,
+        "27": 27,
+        "28": 28,
+        "29": 29,
+        "30": 30,
+        "31": 31,
+        "32": 32,
+        "33": 33,
+        "34": 23,
+        "35": 35,
+        "36": 50,
+        "37": 37,
+        "38": 38,
+        "39": 39,
+        "40": 40,
+        "41": 45,
+        "42": 42,
+        "43": 41,
+        "44": 44,
+        "45": 36,
+        "46": 46,
+        "47": 47,
+        "48": 48,
+        "49": 49,
+        "50": 43,
+        "51": 51
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 52,
+      "train_size": 104,
+      "test_size": 208
+    },
+    "Plane": {
+      "acc1": 99.04761910438538,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 7,
+      "train_size": 105,
+      "test_size": 105
+    },
+    "PowerCons": {
+      "acc1": 85.00000238418579,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 180,
+      "test_size": 180
+    },
+    "ProximalPhalanxOutlineAgeGroup": {
+      "acc1": 82.43902325630188,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 400,
+      "test_size": 205
+    },
+    "ProximalPhalanxOutlineCorrect": {
+      "acc1": 62.886595726013184,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 600,
+      "test_size": 291
+    },
+    "ProximalPhalanxTW": {
+      "acc1": 62.92682886123657,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 6,
+      "train_size": 400,
+      "test_size": 205
+    },
+    "RefrigerationDevices": {
+      "acc1": 54.13333177566528,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 375,
+      "test_size": 375
+    },
+    "ScreenType": {
+      "acc1": 46.39999866485596,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 375,
+      "test_size": 375
+    },
+    "SemgHandGenderCh2": {
+      "acc1": 76.99999809265137,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 300,
+      "test_size": 600
+    },
+    "SemgHandMovementCh2": {
+      "acc1": 34.22222137451172,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 6,
+      "train_size": 450,
+      "test_size": 450
+    },
+    "SemgHandSubjectCh2": {
+      "acc1": 50.66666603088379,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 5,
+      "train_size": 450,
+      "test_size": 450
+    },
+    "ShapesAll": {
+      "acc1": 80.16666769981384,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 16,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 21,
+        "22": 22,
+        "23": 23,
+        "24": 24,
+        "25": 25,
+        "26": 26,
+        "27": 27,
+        "28": 28,
+        "29": 29,
+        "30": 30,
+        "31": 31,
+        "32": 32,
+        "33": 33,
+        "34": 34,
+        "35": 35,
+        "36": 36,
+        "37": 37,
+        "38": 38,
+        "39": 39,
+        "40": 40,
+        "41": 41,
+        "42": 42,
+        "43": 43,
+        "44": 44,
+        "45": 45,
+        "46": 46,
+        "47": 47,
+        "48": 48,
+        "49": 49,
+        "50": 50,
+        "51": 51,
+        "52": 52,
+        "53": 53,
+        "54": 54,
+        "55": 55,
+        "56": 56,
+        "57": 57,
+        "58": 58,
+        "59": 59
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 60,
+      "train_size": 600,
+      "test_size": 600
+    },
+    "SmallKitchenAppliances": {
+      "acc1": 67.73333549499512,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 375,
+      "test_size": 375
+    },
+    "StarLightCurves": {
+      "acc1": 93.40699315071106,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 1000,
+      "test_size": 8236
+    },
+    "Strawberry": {
+      "acc1": 78.64865064620972,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 613,
+      "test_size": 370
+    },
+    "SwedishLeaf": {
+      "acc1": 86.40000224113464,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 15,
+      "train_size": 500,
+      "test_size": 625
+    },
+    "SyntheticControl": {
+      "acc1": 75.99999904632568,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 6,
+      "train_size": 300,
+      "test_size": 300
+    },
+    "ToeSegmentation1": {
+      "acc1": 92.98245906829834,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 40,
+      "test_size": 228
+    },
+    "ToeSegmentation2": {
+      "acc1": 88.46153616905212,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 36,
+      "test_size": 130
+    },
+    "Trace": {
+      "acc1": 100.0,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 4,
+      "train_size": 100,
+      "test_size": 100
+    },
+    "TwoPatterns": {
+      "acc1": 58.35000276565552,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 4,
+      "train_size": 1000,
+      "test_size": 4000
+    },
+    "UMD": {
+      "acc1": 80.55555820465088,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2
+      ],
+      "target_labels": [
+        0,
+        1,
+        2
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 3,
+      "train_size": 36,
+      "test_size": 144
+    },
+    "UWaveGestureLibraryAll": {
+      "acc1": 60.97152233123779,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 8,
+      "train_size": 896,
+      "test_size": 3582
+    },
+    "UWaveGestureLibraryX": {
+      "acc1": 51.9262969493866,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 8,
+      "train_size": 896,
+      "test_size": 3582
+    },
+    "UWaveGestureLibraryY": {
+      "acc1": 46.70574963092804,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 8,
+      "train_size": 896,
+      "test_size": 3582
+    },
+    "UWaveGestureLibraryZ": {
+      "acc1": 52.28922367095947,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 8,
+      "train_size": 896,
+      "test_size": 3582
+    },
+    "Wafer": {
+      "acc1": 85.86956262588501,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 1000,
+      "test_size": 6164
+    },
+    "Wine": {
+      "acc1": 51.851850748062134,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 57,
+      "test_size": 54
+    },
+    "WordSynonyms": {
+      "acc1": 30.40752410888672,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 21,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+        "10": 10,
+        "11": 11,
+        "12": 12,
+        "13": 13,
+        "14": 14,
+        "15": 15,
+        "16": 24,
+        "17": 17,
+        "18": 18,
+        "19": 19,
+        "20": 20,
+        "21": 22,
+        "22": 16,
+        "23": 3,
+        "24": 23
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 25,
+      "train_size": 267,
+      "test_size": 638
+    },
+    "Worms": {
+      "acc1": 72.72727489471436,
+      "label_mapping": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4
+      },
+      "predicted_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "target_labels": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 5,
+      "train_size": 181,
+      "test_size": 77
+    },
+    "WormsTwoClass": {
+      "acc1": 58.44155550003052,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 181,
+      "test_size": 77
+    },
+    "Yoga": {
+      "acc1": 56.36666417121887,
+      "label_mapping": {
+        "0": 0,
+        "1": 1
+      },
+      "predicted_labels": [
+        0,
+        1
+      ],
+      "target_labels": [
+        0,
+        1
+      ],
+      "mode": "zero_shot_bestperm",
+      "num_classes": 2,
+      "train_size": 300,
+      "test_size": 3000
+    }
+  }
+}

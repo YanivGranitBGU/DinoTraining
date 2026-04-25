@@ -1,0 +1,898 @@
+[
+  {
+    "dataset": "ACSF1",
+    "N": 100,
+    "C": 1,
+    "L": 1460,
+    "classes": 10
+  },
+  {
+    "dataset": "Adiac",
+    "N": 390,
+    "C": 1,
+    "L": 176,
+    "classes": 37
+  },
+  {
+    "dataset": "AllGestureWiimoteX",
+    "N": 300,
+    "C": 1,
+    "L": 500,
+    "classes": 10
+  },
+  {
+    "dataset": "AllGestureWiimoteY",
+    "N": 300,
+    "C": 1,
+    "L": 500,
+    "classes": 10
+  },
+  {
+    "dataset": "AllGestureWiimoteZ",
+    "N": 300,
+    "C": 1,
+    "L": 500,
+    "classes": 10
+  },
+  {
+    "dataset": "ArrowHead",
+    "N": 36,
+    "C": 1,
+    "L": 251,
+    "classes": 3
+  },
+  {
+    "dataset": "BME",
+    "N": 30,
+    "C": 1,
+    "L": 128,
+    "classes": 3
+  },
+  {
+    "dataset": "Beef",
+    "N": 30,
+    "C": 1,
+    "L": 470,
+    "classes": 5
+  },
+  {
+    "dataset": "BeetleFly",
+    "N": 20,
+    "C": 1,
+    "L": 512,
+    "classes": 2
+  },
+  {
+    "dataset": "BirdChicken",
+    "N": 20,
+    "C": 1,
+    "L": 512,
+    "classes": 2
+  },
+  {
+    "dataset": "CBF",
+    "N": 30,
+    "C": 1,
+    "L": 128,
+    "classes": 3
+  },
+  {
+    "dataset": "Car",
+    "N": 60,
+    "C": 1,
+    "L": 577,
+    "classes": 4
+  },
+  {
+    "dataset": "Chinatown",
+    "N": 20,
+    "C": 1,
+    "L": 24,
+    "classes": 2
+  },
+  {
+    "dataset": "ChlorineConcentration",
+    "N": 467,
+    "C": 1,
+    "L": 166,
+    "classes": 3
+  },
+  {
+    "dataset": "CinCECGTorso",
+    "N": 40,
+    "C": 1,
+    "L": 1639,
+    "classes": 4
+  },
+  {
+    "dataset": "Coffee",
+    "N": 28,
+    "C": 1,
+    "L": 286,
+    "classes": 2
+  },
+  {
+    "dataset": "Computers",
+    "N": 250,
+    "C": 1,
+    "L": 720,
+    "classes": 2
+  },
+  {
+    "dataset": "CricketX",
+    "N": 390,
+    "C": 1,
+    "L": 300,
+    "classes": 12
+  },
+  {
+    "dataset": "CricketY",
+    "N": 390,
+    "C": 1,
+    "L": 300,
+    "classes": 12
+  },
+  {
+    "dataset": "CricketZ",
+    "N": 390,
+    "C": 1,
+    "L": 300,
+    "classes": 12
+  },
+  {
+    "dataset": "Crop",
+    "N": 7200,
+    "C": 1,
+    "L": 46,
+    "classes": 24
+  },
+  {
+    "dataset": "DiatomSizeReduction",
+    "N": 16,
+    "C": 1,
+    "L": 345,
+    "classes": 4
+  },
+  {
+    "dataset": "DistalPhalanxOutlineAgeGroup",
+    "N": 400,
+    "C": 1,
+    "L": 80,
+    "classes": 3
+  },
+  {
+    "dataset": "DistalPhalanxOutlineCorrect",
+    "N": 600,
+    "C": 1,
+    "L": 80,
+    "classes": 2
+  },
+  {
+    "dataset": "DistalPhalanxTW",
+    "N": 400,
+    "C": 1,
+    "L": 80,
+    "classes": 6
+  },
+  {
+    "dataset": "DodgerLoopDay",
+    "N": 78,
+    "C": 1,
+    "L": 288,
+    "classes": 7
+  },
+  {
+    "dataset": "DodgerLoopGame",
+    "N": 20,
+    "C": 1,
+    "L": 288,
+    "classes": 2
+  },
+  {
+    "dataset": "DodgerLoopWeekend",
+    "N": 20,
+    "C": 1,
+    "L": 288,
+    "classes": 2
+  },
+  {
+    "dataset": "ECG200",
+    "N": 100,
+    "C": 1,
+    "L": 96,
+    "classes": 2
+  },
+  {
+    "dataset": "ECG5000",
+    "N": 500,
+    "C": 1,
+    "L": 140,
+    "classes": 5
+  },
+  {
+    "dataset": "ECGFiveDays",
+    "N": 23,
+    "C": 1,
+    "L": 136,
+    "classes": 2
+  },
+  {
+    "dataset": "EOGHorizontalSignal",
+    "N": 362,
+    "C": 1,
+    "L": 1250,
+    "classes": 12
+  },
+  {
+    "dataset": "EOGVerticalSignal",
+    "N": 362,
+    "C": 1,
+    "L": 1250,
+    "classes": 12
+  },
+  {
+    "dataset": "Earthquakes",
+    "N": 322,
+    "C": 1,
+    "L": 512,
+    "classes": 2
+  },
+  {
+    "dataset": "ElectricDevices",
+    "N": 8926,
+    "C": 1,
+    "L": 96,
+    "classes": 7
+  },
+  {
+    "dataset": "EthanolLevel",
+    "N": 504,
+    "C": 1,
+    "L": 1751,
+    "classes": 4
+  },
+  {
+    "dataset": "FaceAll",
+    "N": 560,
+    "C": 1,
+    "L": 131,
+    "classes": 14
+  },
+  {
+    "dataset": "FaceFour",
+    "N": 24,
+    "C": 1,
+    "L": 350,
+    "classes": 4
+  },
+  {
+    "dataset": "FacesUCR",
+    "N": 200,
+    "C": 1,
+    "L": 131,
+    "classes": 14
+  },
+  {
+    "dataset": "FiftyWords",
+    "N": 450,
+    "C": 1,
+    "L": 270,
+    "classes": 50
+  },
+  {
+    "dataset": "Fish",
+    "N": 175,
+    "C": 1,
+    "L": 463,
+    "classes": 7
+  },
+  {
+    "dataset": "FordA",
+    "N": 3601,
+    "C": 1,
+    "L": 500,
+    "classes": 2
+  },
+  {
+    "dataset": "FordB",
+    "N": 3636,
+    "C": 1,
+    "L": 500,
+    "classes": 2
+  },
+  {
+    "dataset": "FreezerRegularTrain",
+    "N": 150,
+    "C": 1,
+    "L": 301,
+    "classes": 2
+  },
+  {
+    "dataset": "FreezerSmallTrain",
+    "N": 28,
+    "C": 1,
+    "L": 301,
+    "classes": 2
+  },
+  {
+    "dataset": "Fungi",
+    "N": 18,
+    "C": 1,
+    "L": 201,
+    "classes": 18
+  },
+  {
+    "dataset": "GestureMidAirD1",
+    "N": 208,
+    "C": 1,
+    "L": 360,
+    "classes": 26
+  },
+  {
+    "dataset": "GestureMidAirD2",
+    "N": 208,
+    "C": 1,
+    "L": 360,
+    "classes": 26
+  },
+  {
+    "dataset": "GestureMidAirD3",
+    "N": 208,
+    "C": 1,
+    "L": 360,
+    "classes": 26
+  },
+  {
+    "dataset": "GesturePebbleZ1",
+    "N": 132,
+    "C": 1,
+    "L": 455,
+    "classes": 6
+  },
+  {
+    "dataset": "GesturePebbleZ2",
+    "N": 146,
+    "C": 1,
+    "L": 455,
+    "classes": 6
+  },
+  {
+    "dataset": "GunPoint",
+    "N": 50,
+    "C": 1,
+    "L": 150,
+    "classes": 2
+  },
+  {
+    "dataset": "GunPointAgeSpan",
+    "N": 135,
+    "C": 1,
+    "L": 150,
+    "classes": 2
+  },
+  {
+    "dataset": "GunPointMaleVersusFemale",
+    "N": 135,
+    "C": 1,
+    "L": 150,
+    "classes": 2
+  },
+  {
+    "dataset": "GunPointOldVersusYoung",
+    "N": 136,
+    "C": 1,
+    "L": 150,
+    "classes": 2
+  },
+  {
+    "dataset": "Ham",
+    "N": 109,
+    "C": 1,
+    "L": 431,
+    "classes": 2
+  },
+  {
+    "dataset": "HandOutlines",
+    "N": 1000,
+    "C": 1,
+    "L": 2709,
+    "classes": 2
+  },
+  {
+    "dataset": "Haptics",
+    "N": 155,
+    "C": 1,
+    "L": 1092,
+    "classes": 5
+  },
+  {
+    "dataset": "Herring",
+    "N": 64,
+    "C": 1,
+    "L": 512,
+    "classes": 2
+  },
+  {
+    "dataset": "HouseTwenty",
+    "N": 40,
+    "C": 1,
+    "L": 2000,
+    "classes": 2
+  },
+  {
+    "dataset": "InlineSkate",
+    "N": 100,
+    "C": 1,
+    "L": 1882,
+    "classes": 7
+  },
+  {
+    "dataset": "InsectEPGRegularTrain",
+    "N": 62,
+    "C": 1,
+    "L": 601,
+    "classes": 3
+  },
+  {
+    "dataset": "InsectEPGSmallTrain",
+    "N": 17,
+    "C": 1,
+    "L": 601,
+    "classes": 3
+  },
+  {
+    "dataset": "InsectWingbeatSound",
+    "N": 220,
+    "C": 1,
+    "L": 256,
+    "classes": 11
+  },
+  {
+    "dataset": "ItalyPowerDemand",
+    "N": 67,
+    "C": 1,
+    "L": 24,
+    "classes": 2
+  },
+  {
+    "dataset": "LargeKitchenAppliances",
+    "N": 375,
+    "C": 1,
+    "L": 720,
+    "classes": 3
+  },
+  {
+    "dataset": "Lightning2",
+    "N": 60,
+    "C": 1,
+    "L": 637,
+    "classes": 2
+  },
+  {
+    "dataset": "Lightning7",
+    "N": 70,
+    "C": 1,
+    "L": 319,
+    "classes": 7
+  },
+  {
+    "dataset": "Mallat",
+    "N": 55,
+    "C": 1,
+    "L": 1024,
+    "classes": 8
+  },
+  {
+    "dataset": "Meat",
+    "N": 60,
+    "C": 1,
+    "L": 448,
+    "classes": 3
+  },
+  {
+    "dataset": "MedicalImages",
+    "N": 381,
+    "C": 1,
+    "L": 99,
+    "classes": 10
+  },
+  {
+    "dataset": "MelbournePedestrian",
+    "N": 1194,
+    "C": 1,
+    "L": 24,
+    "classes": 10
+  },
+  {
+    "dataset": "MiddlePhalanxOutlineAgeGroup",
+    "N": 400,
+    "C": 1,
+    "L": 80,
+    "classes": 3
+  },
+  {
+    "dataset": "MiddlePhalanxOutlineCorrect",
+    "N": 600,
+    "C": 1,
+    "L": 80,
+    "classes": 2
+  },
+  {
+    "dataset": "MiddlePhalanxTW",
+    "N": 399,
+    "C": 1,
+    "L": 80,
+    "classes": 6
+  },
+  {
+    "dataset": "MixedShapesRegularTrain",
+    "N": 500,
+    "C": 1,
+    "L": 1024,
+    "classes": 5
+  },
+  {
+    "dataset": "MixedShapesSmallTrain",
+    "N": 100,
+    "C": 1,
+    "L": 1024,
+    "classes": 5
+  },
+  {
+    "dataset": "MoteStrain",
+    "N": 20,
+    "C": 1,
+    "L": 84,
+    "classes": 2
+  },
+  {
+    "dataset": "NonInvasiveFetalECGThorax1",
+    "N": 1800,
+    "C": 1,
+    "L": 750,
+    "classes": 42
+  },
+  {
+    "dataset": "NonInvasiveFetalECGThorax2",
+    "N": 1800,
+    "C": 1,
+    "L": 750,
+    "classes": 42
+  },
+  {
+    "dataset": "OSULeaf",
+    "N": 200,
+    "C": 1,
+    "L": 427,
+    "classes": 6
+  },
+  {
+    "dataset": "OliveOil",
+    "N": 30,
+    "C": 1,
+    "L": 570,
+    "classes": 4
+  },
+  {
+    "dataset": "PLAID",
+    "N": 537,
+    "C": 1,
+    "L": 1344,
+    "classes": 11
+  },
+  {
+    "dataset": "PhalangesOutlinesCorrect",
+    "N": 1800,
+    "C": 1,
+    "L": 80,
+    "classes": 2
+  },
+  {
+    "dataset": "Phoneme",
+    "N": 214,
+    "C": 1,
+    "L": 1024,
+    "classes": 39
+  },
+  {
+    "dataset": "PickupGestureWiimoteZ",
+    "N": 50,
+    "C": 1,
+    "L": 361,
+    "classes": 10
+  },
+  {
+    "dataset": "PigAirwayPressure",
+    "N": 104,
+    "C": 1,
+    "L": 2000,
+    "classes": 52
+  },
+  {
+    "dataset": "PigArtPressure",
+    "N": 104,
+    "C": 1,
+    "L": 2000,
+    "classes": 52
+  },
+  {
+    "dataset": "PigCVP",
+    "N": 104,
+    "C": 1,
+    "L": 2000,
+    "classes": 52
+  },
+  {
+    "dataset": "Plane",
+    "N": 105,
+    "C": 1,
+    "L": 144,
+    "classes": 7
+  },
+  {
+    "dataset": "PowerCons",
+    "N": 180,
+    "C": 1,
+    "L": 144,
+    "classes": 2
+  },
+  {
+    "dataset": "ProximalPhalanxOutlineAgeGroup",
+    "N": 400,
+    "C": 1,
+    "L": 80,
+    "classes": 3
+  },
+  {
+    "dataset": "ProximalPhalanxOutlineCorrect",
+    "N": 600,
+    "C": 1,
+    "L": 80,
+    "classes": 2
+  },
+  {
+    "dataset": "ProximalPhalanxTW",
+    "N": 400,
+    "C": 1,
+    "L": 80,
+    "classes": 6
+  },
+  {
+    "dataset": "RefrigerationDevices",
+    "N": 375,
+    "C": 1,
+    "L": 720,
+    "classes": 3
+  },
+  {
+    "dataset": "Rock",
+    "N": 20,
+    "C": 1,
+    "L": 2844,
+    "classes": 4
+  },
+  {
+    "dataset": "ScreenType",
+    "N": 375,
+    "C": 1,
+    "L": 720,
+    "classes": 3
+  },
+  {
+    "dataset": "SemgHandGenderCh2",
+    "N": 300,
+    "C": 1,
+    "L": 1500,
+    "classes": 2
+  },
+  {
+    "dataset": "SemgHandMovementCh2",
+    "N": 450,
+    "C": 1,
+    "L": 1500,
+    "classes": 6
+  },
+  {
+    "dataset": "SemgHandSubjectCh2",
+    "N": 450,
+    "C": 1,
+    "L": 1500,
+    "classes": 5
+  },
+  {
+    "dataset": "ShakeGestureWiimoteZ",
+    "N": 50,
+    "C": 1,
+    "L": 385,
+    "classes": 10
+  },
+  {
+    "dataset": "ShapeletSim",
+    "N": 20,
+    "C": 1,
+    "L": 500,
+    "classes": 2
+  },
+  {
+    "dataset": "ShapesAll",
+    "N": 600,
+    "C": 1,
+    "L": 512,
+    "classes": 60
+  },
+  {
+    "dataset": "SmallKitchenAppliances",
+    "N": 375,
+    "C": 1,
+    "L": 720,
+    "classes": 3
+  },
+  {
+    "dataset": "SmoothSubspace",
+    "N": 150,
+    "C": 1,
+    "L": 15,
+    "classes": 3
+  },
+  {
+    "dataset": "SonyAIBORobotSurface1",
+    "N": 20,
+    "C": 1,
+    "L": 70,
+    "classes": 2
+  },
+  {
+    "dataset": "SonyAIBORobotSurface2",
+    "N": 27,
+    "C": 1,
+    "L": 65,
+    "classes": 2
+  },
+  {
+    "dataset": "StarLightCurves",
+    "N": 1000,
+    "C": 1,
+    "L": 1024,
+    "classes": 3
+  },
+  {
+    "dataset": "Strawberry",
+    "N": 613,
+    "C": 1,
+    "L": 235,
+    "classes": 2
+  },
+  {
+    "dataset": "SwedishLeaf",
+    "N": 500,
+    "C": 1,
+    "L": 128,
+    "classes": 15
+  },
+  {
+    "dataset": "Symbols",
+    "N": 25,
+    "C": 1,
+    "L": 398,
+    "classes": 6
+  },
+  {
+    "dataset": "SyntheticControl",
+    "N": 300,
+    "C": 1,
+    "L": 60,
+    "classes": 6
+  },
+  {
+    "dataset": "ToeSegmentation1",
+    "N": 40,
+    "C": 1,
+    "L": 277,
+    "classes": 2
+  },
+  {
+    "dataset": "ToeSegmentation2",
+    "N": 36,
+    "C": 1,
+    "L": 343,
+    "classes": 2
+  },
+  {
+    "dataset": "Trace",
+    "N": 100,
+    "C": 1,
+    "L": 275,
+    "classes": 4
+  },
+  {
+    "dataset": "TwoLeadECG",
+    "N": 23,
+    "C": 1,
+    "L": 82,
+    "classes": 2
+  },
+  {
+    "dataset": "TwoPatterns",
+    "N": 1000,
+    "C": 1,
+    "L": 128,
+    "classes": 4
+  },
+  {
+    "dataset": "UMD",
+    "N": 36,
+    "C": 1,
+    "L": 150,
+    "classes": 3
+  },
+  {
+    "dataset": "UWaveGestureLibraryAll",
+    "N": 896,
+    "C": 1,
+    "L": 945,
+    "classes": 8
+  },
+  {
+    "dataset": "UWaveGestureLibraryX",
+    "N": 896,
+    "C": 1,
+    "L": 315,
+    "classes": 8
+  },
+  {
+    "dataset": "UWaveGestureLibraryY",
+    "N": 896,
+    "C": 1,
+    "L": 315,
+    "classes": 8
+  },
+  {
+    "dataset": "UWaveGestureLibraryZ",
+    "N": 896,
+    "C": 1,
+    "L": 315,
+    "classes": 8
+  },
+  {
+    "dataset": "Wafer",
+    "N": 1000,
+    "C": 1,
+    "L": 152,
+    "classes": 2
+  },
+  {
+    "dataset": "Wine",
+    "N": 57,
+    "C": 1,
+    "L": 234,
+    "classes": 2
+  },
+  {
+    "dataset": "WordSynonyms",
+    "N": 267,
+    "C": 1,
+    "L": 270,
+    "classes": 25
+  },
+  {
+    "dataset": "Worms",
+    "N": 181,
+    "C": 1,
+    "L": 900,
+    "classes": 5
+  },
+  {
+    "dataset": "WormsTwoClass",
+    "N": 181,
+    "C": 1,
+    "L": 900,
+    "classes": 2
+  },
+  {
+    "dataset": "Yoga",
+    "N": 300,
+    "C": 1,
+    "L": 426,
+    "classes": 2
+  }
+]

@@ -126,7 +126,13 @@ def load_pretrained_weights_for_lora(model, pretrained_weights, checkpoint_key, 
         adapted = {}
         for k, v in state_dict.items():
             new_k = k
-            # Map attention projections to the inner linear of LoRALinear.
+            # If key is already in LoRA format (or a LoRA adapter tensor),
+            # keep it unchanged.
+            if ".linear." in k or ".lora_A" in k or ".lora_B" in k:
+                adapted[new_k] = v
+                continue
+            # Map standard attention projection keys to the inner linear of
+            # LoRALinear only for non-LoRA checkpoints.
             if ".attn.qkv." in k:
                 new_k = k.replace(".attn.qkv.", ".attn.qkv.linear.")
             elif ".attn.proj." in k:
@@ -180,7 +186,7 @@ def load_pretrained_weights_for_lora(model, pretrained_weights, checkpoint_key, 
             # they map into the inner linear weights of LoRALinear.
             if "vit" in model_name:
                 state_dict = _adapt_for_lora(state_dict)
-            model.load_state_dict(state_dict, strict=True)
+            model.load_state_dict(state_dict, strict=False)
         else:
             print("There is no reference weights available for this model => We use random weights.")
 

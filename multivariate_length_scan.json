@@ -1,0 +1,93 @@
+[
+  {
+    "dataset": "ArticularyWordRecognition",
+    "N": 275,
+    "C": 9,
+    "L": 144,
+    "classes": 25
+  },
+  {
+    "dataset": "CharacterTrajectories",
+    "N": 1422,
+    "C": 3,
+    "L": 119,
+    "classes": 20
+  },
+  {
+    "dataset": "DuckDuckGeese",
+    "N": 50,
+    "C": 1345,
+    "L": 270,
+    "classes": 5
+  },
+  {
+    "dataset": "Epilepsy",
+    "N": 137,
+    "C": 3,
+    "L": 206,
+    "classes": 4
+  },
+  {
+    "dataset": "FingerMovements",
+    "N": 316,
+    "C": 28,
+    "L": 50,
+    "classes": 2
+  },
+  {
+    "dataset": "Handwriting",
+    "N": 150,
+    "C": 3,
+    "L": 152,
+    "classes": 26
+  },
+  {
+    "dataset": "Heartbeat",
+    "N": 204,
+    "C": 61,
+    "L": 405,
+    "classes": 2
+  },
+  {
+    "dataset": "NATOPS",
+    "N": 180,
+    "C": 24,
+    "L": 51,
+    "classes": 6
+  },
+  {
+    "dataset": "PEMS-SF",
+    "N": 267,
+    "C": 963,
+    "L": 144,
+    "classes": 7
+  },
+  {
+    "dataset": "RacketSports",
+    "N": 151,
+    "C": 6,
+    "L": 30,
+    "classes": 4
+  },
+  {
+    "dataset": "SelfRegulationSCP1",
+    "N": 268,
+    "C": 6,
+    "L": 896,
+    "classes": 2
+  },
+  {
+    "dataset": "SelfRegulationSCP2",
+    "N": 200,
+    "C": 7,
+    "L": 1152,
+    "classes": 2
+  },
+  {
+    "dataset": "UWaveGestureLibrary",
+    "N": 120,
+    "C": 3,
+    "L": 315,
+    "classes": 8
+  }
+]
