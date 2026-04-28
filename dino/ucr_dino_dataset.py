@@ -1,6 +1,6 @@
 import os
 from typing import List, Tuple
-
+import math
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
@@ -28,6 +28,13 @@ class MultiUCRDinoDataset(Dataset):
         self.root_path = root_path
         self.transform = transform
         self.split = split
+        # Fixed deterministic base geometry before DINO augmentations.
+        self._base_height = 256
+        self._base_width = 256
+        # Adaptive delay-embedding window heuristic parameters.
+        self._embed_ratio = 0.6
+        self._embed_lmin = 48
+        self._embed_lmax = 192
 
         self._datasets: List[str] = []
         self._data: List[np.ndarray] = []
@@ -87,8 +94,48 @@ class MultiUCRDinoDataset(Dataset):
     def __len__(self) -> int:
         return len(self._index_map)
 
+    def _delay_embed_2d(self, x: np.ndarray, height: int, width: int) -> np.ndarray:
+        """Convert a 1D time-series to a 2D delay-embedding matrix.
+
+        Each output column is a sliding window over the 1D signal.
+        The output shape is always (height, width).
+        """
+        if x.ndim != 1:
+            raise ValueError(f"Expected 1D time-series for delay embedding, got shape {x.shape}")
+
+        if height <= 0 or width <= 0:
+            raise ValueError(f"height and width must be positive, got {(height, width)}")
+
+        if x.size == 0:
+            x = np.zeros(height, dtype=np.float32)
+
+        length = int(x.size)
+        raw_l = int(math.floor(self._embed_ratio * length))
+        l = min(self._embed_lmax, max(self._embed_lmin, raw_l))
+        # Never exceed the available signal length.
+        l = max(1, min(l, length))
+
+        max_start = max(0, length - l)
+        delay = (max_start / float(width - 1)) if width > 1 else 0.0
+
+        out = np.empty((height, width), dtype=np.float32)
+        for col in range(width):
+            start = int(round(col * delay))
+            if start > max_start:
+                start = max_start
+            window = x[start:start + l]
+            if l == height:
+                out[:, col] = window
+            elif l == 1:
+                out[:, col] = window[0]
+            else:
+                src = np.linspace(0.0, 1.0, num=l, dtype=np.float32)
+                dst = np.linspace(0.0, 1.0, num=height, dtype=np.float32)
+                out[:, col] = np.interp(dst, src, window).astype(np.float32)
+        return out
+
     def _to_pil_image(self, x: np.ndarray, vmin: float, vmax: float) -> Image.Image:
-        """Convert a 1D array into a 3-channel PIL image using given min/max.
+        """Convert a 1D array into a delay-embedded 3-channel PIL image.
 
         Normalization is done per-dataset & per-channel using precomputed
         vmin/vmax, so samples from the same dataset/channel share the same scale.
@@ -105,10 +152,16 @@ class MultiUCRDinoDataset(Dataset):
         else:
             x = np.zeros_like(x)
 
+        x = np.clip(x, 0.0, 1.0)
+        if np.isnan(x).any() or np.isinf(x).any():
+            print("[WARN] NaN/Inf in normalized signal!", vmin, vmax)
+
+        # Build a deterministic 2D delay-embedding matrix.
+        x2d = self._delay_embed_2d(x, self._base_height, self._base_width)
+
         # Map to [0, 255] uint8 and create a 3-channel image
-        img = (x[None, :] * 255.0).astype(np.uint8)  # (1, T)
-        img = np.stack([img] * 3, axis=0)   # (3, C, T)
-        img = np.transpose(img, (1, 2, 0))  # (C, T, 3) -> (H, W, 3)
+        img = (x2d * 255.0).astype(np.uint8)   # (H, W)
+        img = np.stack([img] * 3, axis=-1)     # (H, W, 3)
         return Image.fromarray(img)
 
     def __getitem__(self, index: int):
@@ -125,6 +178,23 @@ class MultiUCRDinoDataset(Dataset):
         vmax = float(maxs[channel_idx])
 
         img = self._to_pil_image(x, vmin, vmax)
+
+        # ================= DEBUG BLOCK =================
+        if index % 1000 == 0:
+            arr = np.array(img)
+
+            print("\n[DATA DEBUG]")
+            print("index:", index)
+            print("dataset:", self._datasets[dataset_idx])
+            print("x stats:", np.min(x), np.max(x))
+            print("vmin/vmax:", vmin, vmax)
+            print("img shape:", arr.shape)
+            print("img dtype:", arr.dtype)
+            print("img min/max:", arr.min(), arr.max())
+            print("any NaN:", np.isnan(arr).any())
+            print("any Inf:", np.isinf(arr).any())
+        # ==============================================
+            print(f"DEBUG: Input to transform type: {type(img)}, range: {np.array(img).min()} to {np.array(img).max()}")
         if self.transform is not None:
             crops = self.transform(img)
         else:

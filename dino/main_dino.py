@@ -18,6 +18,7 @@ import datetime
 import time
 import math
 import json
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -30,6 +31,8 @@ import torch.nn.functional as F
 from torchvision import datasets, transforms
 from torchvision import models as torchvision_models
 
+# Make sure local modules (like utils.py) can be imported when this
+# script is run directly or via a shell wrapper.
 import utils
 import vision_transformer as vits
 from vision_transformer import DINOHead
@@ -46,9 +49,11 @@ class BalancedDistributedSampler(torch.utils.data.Sampler):
     Sampling probability for each (sample, channel) shard is set inversely
     proportional to the number of shards in its dataset, so that each
     dataset contributes roughly equally in expectation.
+    Optionally, a fixed global number of samples per epoch can be used
+    instead of iterating over the entire dataset size.
     """
 
-    def __init__(self, dataset, num_replicas=None, rank=None, seed=0):
+    def __init__(self, dataset, num_replicas=None, rank=None, seed=0, samples_per_epoch=None):
         if num_replicas is None:
             if not dist.is_available():
                 raise RuntimeError("Requires distributed package to be available")
@@ -62,8 +67,15 @@ class BalancedDistributedSampler(torch.utils.data.Sampler):
         self.rank = rank
         self.seed = seed
 
-        self.num_samples = int(math.ceil(len(self.dataset) * 1.0 / self.num_replicas))
-        self.total_size = self.num_samples * self.num_replicas
+        # Determine how many samples to draw per epoch globally. If
+        # samples_per_epoch is provided, we use that as the target total
+        # number of (sample, channel) shards drawn across all GPUs.
+        if samples_per_epoch is not None:
+            self.num_samples = int(math.ceil(samples_per_epoch * 1.0 / self.num_replicas))
+            self.total_size = self.num_samples * self.num_replicas
+        else:
+            self.num_samples = int(math.ceil(len(self.dataset) * 1.0 / self.num_replicas))
+            self.total_size = self.num_samples * self.num_replicas
 
         # Precompute per-sample weights based on dataset index.
         from collections import Counter
@@ -158,6 +170,26 @@ def get_args_parser():
         choices=['adamw', 'sgd', 'lars'], help="""Type of optimizer. We recommend using adamw with ViTs.""")
     parser.add_argument('--drop_path_rate', type=float, default=0.1, help="stochastic depth rate")
 
+    parser.add_argument('--global_samples_per_epoch', type=int, default=0,
+        help='If >0, total number of (sample, channel) shards drawn per epoch across all GPUs. '
+             '0 means use the full dataset-derived epoch size.')
+
+    # LoRA adapters (optional)
+    parser.add_argument('--use_lora', type=utils.bool_flag, default=False, help="""Whether to enable
+        LoRA adapters in the ViT attention projections. When enabled, only LoRA parameters in the
+        backbone (plus the DINO head) are trainable; the base ViT weights remain frozen.""")
+    parser.add_argument('--lora_rank', type=int, default=8, help="""LoRA rank (r). Set to a small
+        value like 4, 8, or 16. When --use_lora=false this is ignored.""")
+    parser.add_argument('--lora_alpha', type=float, default=16.0, help="""LoRA scaling factor. Effective
+        update is scaled by alpha / r. When --use_lora=false this is ignored.""")
+
+    # Optional pretrained weights (for fine-tuning or LoRA)
+    parser.add_argument('--pretrained_weights', default='', type=str,
+        help="""Path to pretrained DINO weights to initialize the backbone.
+        If empty, training starts from random init (as in original DINO).""")
+    parser.add_argument('--checkpoint_key', default='teacher', type=str,
+        help='Key to use inside the checkpoint dict (e.g. "teacher" or "student").')
+
     # Multi-crop parameters
     parser.add_argument('--global_crops_scale', type=float, nargs='+', default=(0.4, 1.),
         help="""Scale range of the cropped image before resizing, relatively to the origin image.
@@ -177,10 +209,109 @@ def get_args_parser():
     parser.add_argument('--saveckp_freq', default=20, type=int, help='Save checkpoint every x epochs.')
     parser.add_argument('--seed', default=0, type=int, help='Random seed.')
     parser.add_argument('--num_workers', default=10, type=int, help='Number of data loading workers per GPU.')
+
+    # Periodic UCR_CLSA evaluation during training
+    parser.add_argument('--eval_ucr_clsa_every', default=2, type=int,
+        help='Run eval_ucr_clsa.py every N epochs (0 disables).')
+    parser.add_argument('--eval_ucr_clsa_epochs', default='0,2,4,7', type=str,
+        help='Comma-separated epoch ids to evaluate, where 0 means the pretrained snapshot before training starts.')
+    parser.add_argument('--eval_ucr_clsa_data_root',
+        default='/home/yanivgra/Frequency-masked-Embedding-Inference/datasets_clsa/UCR_CLSA',
+        type=str,
+        help='Root with UCR_CLSA dataset folders containing train.pt/test.pt.')
+    parser.add_argument('--eval_ucr_clsa_dataset', default='all', type=str,
+        help='Dataset name or "all" for periodic UCR_CLSA evaluation.')
+    parser.add_argument('--eval_ucr_clsa_compute_tsne', default=True, type=utils.bool_flag,
+        help='Whether to generate t-SNE plots during periodic UCR_CLSA evaluation.')
+    parser.add_argument('--eval_ucr_clsa_batch_size', default=64, type=int,
+        help='Batch size used by periodic UCR_CLSA evaluation.')
+    parser.add_argument('--eval_ucr_clsa_num_workers', default=4, type=int,
+        help='Number of dataloader workers used by periodic UCR_CLSA evaluation.')
+    parser.add_argument('--eval_ucr_clsa_output_subdir', default='eval_ucr_clsa_during_train', type=str,
+        help='Subdirectory under output_dir for periodic UCR_CLSA evaluation artifacts.')
+
     parser.add_argument("--dist_url", default="env://", type=str, help="""url used to set up
         distributed training; see https://pytorch.org/docs/stable/distributed.html""")
-    parser.add_argument("--local_rank", default=0, type=int, help="Please ignore and do not set this argument.")
+    parser.add_argument("--local_rank", "--local-rank", default=0, type=int, help="Please ignore and do not set this argument.")
     return parser
+
+
+def _run_periodic_ucr_clsa_eval(
+    args,
+    epoch: int,
+    checkpoint_path: str,
+    use_lora_override=None,
+    checkpoint_tag_override=None,
+) -> None:
+    """Run UCR_CLSA evaluation periodically from the training loop.
+
+    Only main process executes the evaluator; non-main processes wait at barriers
+    to keep distributed training synchronized.
+    """
+    target_epochs = {
+        int(value.strip())
+        for value in str(args.eval_ucr_clsa_epochs).split(',')
+        if value.strip()
+    }
+    current_epoch = 0 if epoch < 0 else epoch + 1
+    checkpoint_tag = checkpoint_tag_override if checkpoint_tag_override else ("pretrained" if epoch < 0 else f"epoch_{epoch + 1:04d}")
+    use_lora_flag = args.use_lora if use_lora_override is None else bool(use_lora_override)
+
+    if not target_epochs:
+        return
+    if not args.eval_ucr_clsa_data_root:
+        return
+    if current_epoch not in target_epochs:
+        return
+
+    if dist.is_available() and dist.is_initialized():
+        dist.barrier()
+
+    if utils.is_main_process():
+        eval_script = Path(__file__).with_name("eval_ucr_clsa.py")
+        eval_output_dir = Path(args.output_dir) / args.eval_ucr_clsa_output_subdir / checkpoint_tag
+        eval_output_dir.mkdir(parents=True, exist_ok=True)
+
+        eval_device = f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu"
+
+        cmd = [
+            sys.executable,
+            str(eval_script),
+            "--checkpoint_path", checkpoint_path,
+            "--checkpoint_key", args.checkpoint_key,
+            "--checkpoint_tag", checkpoint_tag,
+            "--use_lora", str(use_lora_flag).lower(),
+            "--linear_finetune", "false",
+            "--search_label_permutations", "true",
+            "--print_logs", "true",
+            "--compute_tsne", str(args.eval_ucr_clsa_compute_tsne).lower(),
+            "--include_excluded_datasets", "false",
+            "--skip_nan_inf_datasets", "true",
+            "--min_train_samples_for_eval", "30",
+            "--min_test_samples_for_eval", "30",
+            "--min_sequence_length_for_eval", "30",
+            "--data_root", args.eval_ucr_clsa_data_root,
+            "--dataset", args.eval_ucr_clsa_dataset,
+            "--output_dir", str(eval_output_dir),
+            "--arch", args.arch,
+            "--patch_size", str(args.patch_size),
+            "--n_last_blocks", "1",
+            "--avgpool_patchtokens", "true",
+            "--lora_rank", str(args.lora_rank),
+            "--lora_alpha", str(args.lora_alpha),
+            "--batch_size", str(args.eval_ucr_clsa_batch_size),
+            "--num_workers", str(args.eval_ucr_clsa_num_workers),
+            "--seed", str(args.seed),
+            "--device", eval_device,
+        ]
+
+        print(f"[eval] Running periodic UCR_CLSA eval at tag {checkpoint_tag}")
+        result = subprocess.run(cmd, cwd=str(Path(__file__).parent), check=False)
+        if result.returncode != 0:
+            print(f"[eval][warn] eval_ucr_clsa.py failed with return code {result.returncode} at tag {checkpoint_tag}")
+
+    if dist.is_available() and dist.is_initialized():
+        dist.barrier()
 
 
 def train_dino(args):
@@ -189,6 +320,9 @@ def train_dino(args):
     print("git:\n  {}\n".format(utils.get_sha()))
     print("\n".join("%s: %s" % (k, str(v)) for k, v in sorted(dict(vars(args)).items())))
     cudnn.benchmark = True
+
+    checkpoint_dir = Path(args.output_dir) / "checkpoints"
+    checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
     # ============ preparing data ... ============
     transform = DataAugmentationDINO(
@@ -202,32 +336,52 @@ def train_dino(args):
 
     # Sampler: balanced across UCR datasets for both single- and multi-GPU
     # runs. Each dataset contributes roughly equally in expectation.
+    samples_per_epoch = None
+    if hasattr(args, "global_samples_per_epoch") and args.global_samples_per_epoch > 0:
+        samples_per_epoch = args.global_samples_per_epoch
     sampler = BalancedDistributedSampler(
         dataset,
         num_replicas=args.world_size,
         rank=args.rank,
         seed=args.seed,
+        samples_per_epoch=samples_per_epoch,
     )
+    # Force num_workers=0 for distributed runs to avoid deadlocks
+    num_workers = args.num_workers
+    if hasattr(args, 'world_size') and args.world_size > 1:
+        print("[INFO] Distributed run detected: setting num_workers=0 to avoid DataLoader deadlocks.")
+        num_workers = 0
+    print("[DEBUG] Creating DataLoader...")
     data_loader = torch.utils.data.DataLoader(
         dataset,
         sampler=sampler,
         batch_size=args.batch_size_per_gpu,
-        num_workers=args.num_workers,
+        num_workers=num_workers,
         pin_memory=True,
         drop_last=True,
     )
-    print(f"Data loaded: there are {len(dataset)} images.")
+    print(f"[DEBUG] DataLoader created. Dataset size: {len(dataset)}")
 
     # ============ building student and teacher networks ... ============
     # we changed the name DeiT-S for ViT-S to avoid confusions
     args.arch = args.arch.replace("deit", "vit")
     # if the network is a Vision Transformer (i.e. vit_tiny, vit_small, vit_base)
     if args.arch in vits.__dict__.keys():
+        lora_rank = args.lora_rank if args.use_lora else 0
         student = vits.__dict__[args.arch](
             patch_size=args.patch_size,
             drop_path_rate=args.drop_path_rate,  # stochastic depth
+            lora_rank=lora_rank,
+            lora_alpha=args.lora_alpha,
         )
-        teacher = vits.__dict__[args.arch](patch_size=args.patch_size)
+        # Teacher uses the same ViT architecture (including LoRA adapters).
+        # All of its parameters are frozen w.r.t. gradients and are updated
+        # only via EMA from the student.
+        teacher = vits.__dict__[args.arch](
+            patch_size=args.patch_size,
+            lora_rank=lora_rank,
+            lora_alpha=args.lora_alpha,
+        )
         embed_dim = student.embed_dim
     # if the network is a XCiT
     elif args.arch in torch.hub.list("facebookresearch/xcit:main"):
@@ -254,6 +408,70 @@ def train_dino(args):
         teacher,
         DINOHead(embed_dim, args.out_dim, args.use_bn_in_head),
     )
+
+    # Optionally initialize the ViT backbone from pretrained DINO weights.
+    if args.pretrained_weights:
+        if args.arch in vits.__dict__.keys():
+            if args.use_lora:
+                # LoRA-enabled ViT: map standard DINO weights into
+                # the inner linear layers of LoRALinear.
+                utils.load_pretrained_weights_for_lora(
+                    student.backbone,
+                    args.pretrained_weights,
+                    args.checkpoint_key,
+                    args.arch,
+                    args.patch_size,
+                )
+            else:
+                # Standard ViT without LoRA.
+                utils.load_pretrained_weights(
+                    student.backbone,
+                    args.pretrained_weights,
+                    args.checkpoint_key,
+                    args.arch,
+                    args.patch_size,
+                )
+        else:
+            # For non-ViT architectures, fall back to the generic loader.
+            utils.load_pretrained_weights(
+                student.backbone if hasattr(student, 'backbone') else student,
+                args.pretrained_weights,
+                args.checkpoint_key,
+                args.arch,
+                args.patch_size,
+            )
+
+    # When using LoRA, freeze all backbone parameters except LoRA adapters.
+    if args.use_lora and args.arch in vits.__dict__.keys():
+        for name, param in student.backbone.named_parameters():
+            # LoRA parameters are named lora_A / lora_B inside LoRALinear
+            if "lora_A" in name or "lora_B" in name:
+                param.requires_grad = True
+            else:
+                param.requires_grad = False
+
+    # ============ report parameter counts (student side) ============
+    if utils.is_main_process():
+        total_params = sum(p.numel() for p in student.parameters())
+        trainable_params = sum(p.numel() for p in student.parameters() if p.requires_grad)
+        lora_params = sum(
+            p.numel()
+            for n, p in student.named_parameters()
+            if "lora_A" in n or "lora_B" in n
+        )
+        head_params = sum(
+            p.numel()
+            for n, p in student.named_parameters()
+            if n.startswith("head.")
+        )
+        print("\n==== DINO student parameter counts ====")
+        print(f"Total params (student + head): {total_params}")
+        print(f"Trainable params:              {trainable_params}")
+        print(f"Trainable ratio:               {trainable_params/total_params:.4f}")
+        print(f"DINO head params only:         {head_params}")
+        if args.use_lora and args.arch in vits.__dict__.keys():
+            print(f"LoRA params only:              {lora_params}")
+        print("======================================\n")
     # move networks to gpu
     student, teacher = student.cuda(), teacher.cuda()
     # synchronize batch norms (if any)
@@ -268,8 +486,10 @@ def train_dino(args):
         # teacher_without_ddp and teacher are the same thing
         teacher_without_ddp = teacher
     student = nn.parallel.DistributedDataParallel(student, device_ids=[args.gpu])
-    # teacher and student start with the same weights
-    teacher_without_ddp.load_state_dict(student.module.state_dict())
+    # teacher and student start with the same base weights.
+    # When LoRA is enabled, the student has additional lora_* parameters
+    # that do not exist in the teacher; we ignore those extra keys.
+    teacher_without_ddp.load_state_dict(student.module.state_dict(), strict=False)
     # there is no backpropagation through the teacher, so no need for gradients
     for p in teacher.parameters():
         p.requires_grad = False
@@ -298,6 +518,16 @@ def train_dino(args):
     if args.use_fp16:
         fp16_scaler = torch.cuda.amp.GradScaler()
 
+    # Evaluate the pretrained snapshot before the first optimization step.
+    if args.pretrained_weights:
+        _run_periodic_ucr_clsa_eval(
+            args,
+            -1,
+            args.pretrained_weights,
+            use_lora_override=False,
+            checkpoint_tag_override="pre_lora",
+        )
+
     # ============ init schedulers ... ============
     lr_schedule = utils.cosine_scheduler(
         args.lr * (args.batch_size_per_gpu * utils.get_world_size()) / 256.,  # linear scaling rule
@@ -318,7 +548,7 @@ def train_dino(args):
     # ============ optionally resume training ... ============
     to_restore = {"epoch": 0}
     utils.restart_from_checkpoint(
-        os.path.join(args.output_dir, "checkpoint.pth"),
+        os.path.join(checkpoint_dir, "checkpoint.pth"),
         run_variables=to_restore,
         student=student,
         teacher=teacher,
@@ -349,14 +579,18 @@ def train_dino(args):
         }
         if fp16_scaler is not None:
             save_dict['fp16_scaler'] = fp16_scaler.state_dict()
-        utils.save_on_master(save_dict, os.path.join(args.output_dir, 'checkpoint.pth'))
+        utils.save_on_master(save_dict, os.path.join(checkpoint_dir, 'checkpoint.pth'))
         if args.saveckp_freq and epoch % args.saveckp_freq == 0:
-            utils.save_on_master(save_dict, os.path.join(args.output_dir, f'checkpoint{epoch:04}.pth'))
+            utils.save_on_master(save_dict, os.path.join(checkpoint_dir, f'checkpoint{epoch:04}.pth'))
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                      'epoch': epoch}
         if utils.is_main_process():
-            with (Path(args.output_dir) / "log.txt").open("a") as f:
+            with (checkpoint_dir / "log.txt").open("a") as f:
                 f.write(json.dumps(log_stats) + "\n")
+
+        # ============ periodic UCR_CLSA evaluation during training ... ============
+        _run_periodic_ucr_clsa_eval(args, epoch, os.path.join(checkpoint_dir, 'checkpoint.pth'))
+
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
     print('Training time {}'.format(total_time_str))
@@ -367,7 +601,12 @@ def train_one_epoch(student, teacher, teacher_without_ddp, dino_loss, data_loade
                     fp16_scaler, args):
     metric_logger = utils.MetricLogger(delimiter="  ")
     header = 'Epoch: [{}/{}]'.format(epoch, args.epochs)
+    print("[DEBUG] Entering training loop. Fetching first batch...")
+    first_batch = True
     for it, (images, _) in enumerate(metric_logger.log_every(data_loader, 10, header)):
+        if first_batch:
+            print("[DEBUG] First batch fetched successfully.")
+            first_batch = False
         # update weight decay and learning rate according to their schedule
         it = len(data_loader) * epoch + it  # global training iteration
         for i, param_group in enumerate(optimizer.param_groups):
@@ -410,6 +649,7 @@ def train_one_epoch(student, teacher, teacher_without_ddp, dino_loss, data_loade
         # EMA update for the teacher
         with torch.no_grad():
             m = momentum_schedule[it]  # momentum parameter
+            # EMA over all teacher parameters (backbone, LoRA, and DINO head).
             for param_q, param_k in zip(student.module.parameters(), teacher_without_ddp.parameters()):
                 param_k.data.mul_(m).add_((1 - m) * param_q.detach().data)
 

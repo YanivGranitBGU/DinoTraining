@@ -9,7 +9,7 @@ python main_dino.py \
     --arch vit_tiny \
     --patch_size 8 \
     --data_path /home/yanivgra/DinoTraining/data/multivariate \
-    --output_dir /home/yanivgra/DinoTraining/output_smoke_1gpu \
+    --output_dir /home/yanivgra/DinoTraining/output_lora_8gpu_DelayEmbeddings/smoke_1gpu \
     --epochs 10 \
     --warmup_epochs 0 \
     --batch_size_per_gpu 16 \
@@ -21,6 +21,6 @@ python main_dino.py \
 #   --arch vit_base \
 #   --patch_size 8 \
 #   --data_path /home/yanivgra/DinoTraining/data/multivariate \
-#   --output_dir /home/yanivgra/DinoTraining/output \
+#   --output_dir /home/yanivgra/DinoTraining/output_lora_8gpu_DelayEmbeddings \
 #   --epochs 100 \
 #   --lr 0.0001

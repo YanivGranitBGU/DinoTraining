@@ -24,6 +24,59 @@ import torch.nn as nn
 from utils import trunc_normal_
 
 
+class LoRALinear(nn.Module):
+    """Linear layer with optional LoRA adaptation.
+
+    When r > 0, the effective weight is W + (B @ A) * (alpha / r), and the
+    base weight W is frozen while only A and B are trainable. When r == 0,
+    this behaves exactly like the wrapped nn.Linear.
+    """
+
+    def __init__(
+        self,
+        linear: nn.Linear,
+        r: int = 0,
+        lora_alpha: float = 1.0,
+        lora_dropout: float = 0.0,
+    ):
+        super().__init__()
+        self.linear = linear
+        self.r = int(r) if r is not None else 0
+        self.lora_alpha = float(lora_alpha)
+        self.scaling = self.lora_alpha / self.r if self.r > 0 else 1.0
+
+        if lora_dropout > 0.0:
+            self.lora_dropout = nn.Dropout(lora_dropout)
+        else:
+            self.lora_dropout = nn.Identity()
+
+        if self.r > 0:
+            in_features = self.linear.in_features
+            out_features = self.linear.out_features
+            # A: (r, in_features), B: (out_features, r)
+            self.lora_A = nn.Parameter(torch.zeros(self.r, in_features))
+            self.lora_B = nn.Parameter(torch.zeros(out_features, self.r))
+            nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
+            nn.init.zeros_(self.lora_B)
+
+            # Freeze base linear weights; only LoRA params remain trainable.
+            for p in self.linear.parameters():
+                p.requires_grad = False
+        else:
+            # No LoRA: behave exactly like a plain nn.Linear.
+            self.lora_A = None
+            self.lora_B = None
+
+    def forward(self, x):
+        result = self.linear(x)
+        if self.r <= 0 or self.lora_A is None or self.lora_B is None:
+            return result
+        lora_input = self.lora_dropout(x)
+        lora = lora_input @ self.lora_A.t()
+        lora = lora @ self.lora_B.t()
+        return result + self.scaling * lora
+
+
 def drop_path(x, drop_prob: float = 0., training: bool = False):
     if drop_prob == 0. or not training:
         return x
@@ -66,15 +119,34 @@ class Mlp(nn.Module):
 
 
 class Attention(nn.Module):
-    def __init__(self, dim, num_heads=8, qkv_bias=False, qk_scale=None, attn_drop=0., proj_drop=0.):
+    def __init__(
+        self,
+        dim,
+        num_heads=8,
+        qkv_bias=False,
+        qk_scale=None,
+        attn_drop=0.,
+        proj_drop=0.,
+        lora_rank: int = 0,
+        lora_alpha: float = 1.0,
+    ):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
         self.scale = qk_scale or head_dim ** -0.5
 
-        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        base_qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        base_proj = nn.Linear(dim, dim)
+        # Only wrap with LoRA when lora_rank > 0; otherwise keep the
+        # original nn.Linear modules so the architecture and state_dict
+        # stay identical to standard DINO ViT.
+        if lora_rank and lora_rank > 0:
+            self.qkv = LoRALinear(base_qkv, r=lora_rank, lora_alpha=lora_alpha, lora_dropout=0.0)
+            self.proj = LoRALinear(base_proj, r=lora_rank, lora_alpha=lora_alpha, lora_dropout=0.0)
+        else:
+            self.qkv = base_qkv
+            self.proj = base_proj
         self.attn_drop = nn.Dropout(attn_drop)
-        self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
 
     def forward(self, x):
@@ -93,12 +165,33 @@ class Attention(nn.Module):
 
 
 class Block(nn.Module):
-    def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop=0., attn_drop=0.,
-                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm):
+    def __init__(
+        self,
+        dim,
+        num_heads,
+        mlp_ratio=4.,
+        qkv_bias=False,
+        qk_scale=None,
+        drop=0.,
+        attn_drop=0.,
+        drop_path=0.,
+        act_layer=nn.GELU,
+        norm_layer=nn.LayerNorm,
+        lora_rank: int = 0,
+        lora_alpha: float = 1.0,
+    ):
         super().__init__()
         self.norm1 = norm_layer(dim)
         self.attn = Attention(
-            dim, num_heads=num_heads, qkv_bias=qkv_bias, qk_scale=qk_scale, attn_drop=attn_drop, proj_drop=drop)
+            dim,
+            num_heads=num_heads,
+            qkv_bias=qkv_bias,
+            qk_scale=qk_scale,
+            attn_drop=attn_drop,
+            proj_drop=drop,
+            lora_rank=lora_rank,
+            lora_alpha=lora_alpha,
+        )
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
@@ -132,10 +225,28 @@ class PatchEmbed(nn.Module):
 
 
 class VisionTransformer(nn.Module):
-    """ Vision Transformer """
-    def __init__(self, img_size=[224], patch_size=16, in_chans=3, num_classes=0, embed_dim=768, depth=12,
-                 num_heads=12, mlp_ratio=4., qkv_bias=False, qk_scale=None, drop_rate=0., attn_drop_rate=0.,
-                 drop_path_rate=0., norm_layer=nn.LayerNorm, **kwargs):
+    """ Vision Transformer with optional LoRA in attention layers. """
+
+    def __init__(
+        self,
+        img_size=[224],
+        patch_size=16,
+        in_chans=3,
+        num_classes=0,
+        embed_dim=768,
+        depth=12,
+        num_heads=12,
+        mlp_ratio=4.,
+        qkv_bias=False,
+        qk_scale=None,
+        drop_rate=0.,
+        attn_drop_rate=0.,
+        drop_path_rate=0.,
+        norm_layer=nn.LayerNorm,
+        lora_rank: int = 0,
+        lora_alpha: float = 1.0,
+        **kwargs,
+    ):
         super().__init__()
         self.num_features = self.embed_dim = embed_dim
 
@@ -150,9 +261,20 @@ class VisionTransformer(nn.Module):
         dpr = [x.item() for x in torch.linspace(0, drop_path_rate, depth)]  # stochastic depth decay rule
         self.blocks = nn.ModuleList([
             Block(
-                dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, qk_scale=qk_scale,
-                drop=drop_rate, attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer)
-            for i in range(depth)])
+                dim=embed_dim,
+                num_heads=num_heads,
+                mlp_ratio=mlp_ratio,
+                qkv_bias=qkv_bias,
+                qk_scale=qk_scale,
+                drop=drop_rate,
+                attn_drop=attn_drop_rate,
+                drop_path=dpr[i],
+                norm_layer=norm_layer,
+                lora_rank=lora_rank,
+                lora_alpha=lora_alpha,
+            )
+            for i in range(depth)
+        ])
         self.norm = norm_layer(embed_dim)
 
         # Classifier head
