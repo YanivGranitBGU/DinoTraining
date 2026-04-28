@@ -1,6 +1,6 @@
 import os
 from typing import List, Tuple
-
+import math
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
@@ -153,6 +153,8 @@ class MultiUCRDinoDataset(Dataset):
             x = np.zeros_like(x)
 
         x = np.clip(x, 0.0, 1.0)
+        if np.isnan(x).any() or np.isinf(x).any():
+            print("[WARN] NaN/Inf in normalized signal!", vmin, vmax)
 
         # Build a deterministic 2D delay-embedding matrix.
         x2d = self._delay_embed_2d(x, self._base_height, self._base_width)
@@ -176,6 +178,23 @@ class MultiUCRDinoDataset(Dataset):
         vmax = float(maxs[channel_idx])
 
         img = self._to_pil_image(x, vmin, vmax)
+
+        # ================= DEBUG BLOCK =================
+        if index % 1000 == 0:
+            arr = np.array(img)
+
+            print("\n[DATA DEBUG]")
+            print("index:", index)
+            print("dataset:", self._datasets[dataset_idx])
+            print("x stats:", np.min(x), np.max(x))
+            print("vmin/vmax:", vmin, vmax)
+            print("img shape:", arr.shape)
+            print("img dtype:", arr.dtype)
+            print("img min/max:", arr.min(), arr.max())
+            print("any NaN:", np.isnan(arr).any())
+            print("any Inf:", np.isinf(arr).any())
+        # ==============================================
+            print(f"DEBUG: Input to transform type: {type(img)}, range: {np.array(img).min()} to {np.array(img).max()}")
         if self.transform is not None:
             crops = self.transform(img)
         else:
